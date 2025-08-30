@@ -162,6 +162,8 @@ STORAGES = {
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 
+# User Profile Model (extends Django's built-in User model)
+
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "naboomcommunity"
