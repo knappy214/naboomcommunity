@@ -4,18 +4,157 @@
 {% block body_class %}template-homepage{% endblock %}
 
 {% block extra_css %}
-
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
-<link rel="stylesheet" href="{% static 'css/welcome_page.css' %}">
+<link rel="stylesheet" href="{% static 'css/naboomcommunity.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <h1>Naboom Community</h1>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#community">Community</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="/admin/" class="btn btn-primary">Admin</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
 
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
-{% include 'home/welcome_page.html' %}
+<main id="main-content" class="main-content">
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <h2 class="card-title">Welcome to Naboom Community</h2>
+                <p>We are a vibrant community dedicated to supporting and connecting our members through faith, fellowship, and service.</p>
+                <a href="#about" class="btn">Learn More</a>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <h2 class="card-title">Community Groups</h2>
+                <p>Join our various community groups including Elders, Youth, Choir, Tech Support, Prayer Team, and Outreach.</p>
+                <a href="#community" class="btn">View Groups</a>
+            </div>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-4">
+            <div class="card">
+                <h3 class="card-title">Spiritual Growth</h3>
+                <p>Deepen your faith through our spiritual programs and prayer support.</p>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <h3 class="card-title">Community Service</h3>
+                <p>Make a difference in our community through various outreach programs.</p>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <h3 class="card-title">Youth Development</h3>
+                <p>Supporting the next generation through mentorship and activities.</p>
+            </div>
+        </div>
+    </div>
+
+    <section id="about" class="mt-4">
+        <h2>About Our Community</h2>
+        <p>Naboom Community is built on the foundation of faith, love, and service. We believe in creating a welcoming environment where everyone can find support, grow spiritually, and contribute to the well-being of our community.</p>
+        
+        <div class="row">
+            <div class="col-6">
+                <h3>Our Mission</h3>
+                <p>To foster a supportive community that nurtures spiritual growth, promotes fellowship, and serves those in need.</p>
+            </div>
+            <div class="col-6">
+                <h3>Our Values</h3>
+                <ul>
+                    <li>Faith and Spirituality</li>
+                    <li>Community and Fellowship</li>
+                    <li>Service and Outreach</li>
+                    <li>Inclusivity and Welcome</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="mt-4">
+        <h2>Our Services</h2>
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <h3 class="card-title">Prayer Support</h3>
+                    <p>Our dedicated prayer team is available to support you in times of need.</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <h3 class="card-title">Tech Assistance</h3>
+                    <p>Get help with technology through our Tech Support team.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="community" class="mt-4">
+        <h2>Join Our Community</h2>
+        <p>Become part of our growing community and discover the many ways you can get involved.</p>
+        
+        <div class="row">
+            <div class="col-4">
+                <div class="card">
+                    <h3 class="card-title">Elders</h3>
+                    <p>Senior community members and spiritual leaders.</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <h3 class="card-title">Youth</h3>
+                    <p>Young community members and activities.</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <h3 class="card-title">Choir</h3>
+                    <p>Music ministry and worship team.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="mt-4">
+        <h2>Contact Us</h2>
+        <p>Get in touch with us to learn more about our community and how you can get involved.</p>
+        
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <h3 class="card-title">Get Involved</h3>
+                    <p>Ready to join our community? Contact us to learn more about membership and participation opportunities.</p>
+                    <a href="/admin/" class="btn btn-primary">Contact Admin</a>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <h3 class="card-title">Visit Us</h3>
+                    <p>We welcome visitors and new members to join us in building a stronger, more connected community.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2024 Naboom Community. All rights reserved.</p>
+        <p>Building community through faith, fellowship, and service.</p>
+    </div>
+</footer>
 {% endblock content %}

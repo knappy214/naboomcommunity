@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}CSS Test Page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/naboomcommunity.css' %}">
+<style>
+    .test-section {
+        margin: 2rem 0;
+        padding: 1rem;
+        border: 2px solid #4B8F8C;
+        border-radius: 8px;
+    }
+    .test-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+    .test-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <h1>CSS Test Page</h1>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/admin/">Admin</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<main class="main-content">
+    <h1>CSS Test Page</h1>
+    <p>This page is designed to test if the CSS is loading properly.</p>
+    
+    <div class="test-section test-success">
+        <h2>✅ CSS Loading Test</h2>
+        <p>If you can see this styled content, the CSS is working correctly!</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <h3 class="card-title">Test Card 1</h3>
+                <p>This is a test card to verify the card styling is working.</p>
+                <button class="btn">Test Button</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <h3 class="card-title">Test Card 2</h3>
+                <p>Another test card to verify the grid system is working.</p>
+                <button class="btn btn-primary">Primary Button</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section test-info">
+        <h3>CSS Features Being Tested:</h3>
+        <ul>
+            <li>Header styling with gradient background</li>
+            <li>Card components with hover effects</li>
+            <li>Button styling (regular and primary)</li>
+            <li>Grid system (row and column classes)</li>
+            <li>Typography and color scheme</li>
+            <li>Responsive design</li>
+        </ul>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Test Form Field:</label>
+        <input type="text" class="form-control" placeholder="Type something here...">
+    </div>
+    
+    <div class="text-center">
+        <a href="/" class="btn">Back to Home</a>
+        <a href="/admin/" class="btn btn-primary">Go to Admin</a>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <p>CSS Test Page - Naboom Community</p>
+    </div>
+</footer>
+{% endblock %}
