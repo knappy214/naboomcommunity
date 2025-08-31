@@ -168,6 +168,10 @@ WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
     ("af", "Afrikaans"),
     # Add more languages as needed
 ]
+# Add this line for Django to find translation files
+LOCALE_PATHS = [
+    os.path.join(PROJECT_DIR, 'home', 'locale'),
+]
 
 USE_TZ = True
 

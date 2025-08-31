@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
+from django.db import models
 from .models import UserProfile, UserGroup, UserRole, UserGroupMembership
 
 
@@ -107,97 +108,157 @@ def get_user_statistics() -> Dict[str, Any]:
 def create_default_groups_and_roles():
     """
     Create default user groups and roles for the community.
-    This should be called during initial setup.
+    This function should be called during initial setup.
     """
     # Create default roles
     roles = {
-        'Leader': {
-            'description': 'Group leader with full administrative privileges',
-            'permissions': {
-                'can_edit_group': True,
-                'can_add_members': True,
-                'can_remove_members': True,
-                'can_assign_roles': True,
-                'can_view_all_members': True
-            }
-        },
-        'Moderator': {
-            'description': 'Group moderator with limited administrative privileges',
-            'permissions': {
-                'can_edit_group': False,
-                'can_add_members': True,
-                'can_remove_members': False,
-                'can_assign_roles': False,
-                'can_view_all_members': True
-            }
-        },
         'Member': {
-            'description': 'Regular group member with basic privileges',
+            'description': _('Basic member permissions and access'),
             'permissions': {
-                'can_edit_group': False,
-                'can_add_members': False,
-                'can_remove_members': False,
-                'can_assign_roles': False,
-                'can_view_all_members': False
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True
+            }
+        },
+        'Elder': {
+            'description': _('Elder-level permissions and leadership access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_members': True,
+                'can_edit_content': True
+            }
+        },
+        'Deacon': {
+            'description': _('Deacon-level permissions and service access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_services': True,
+                'can_edit_content': True
+            }
+        },
+        'Youth Leader': {
+            'description': _('Youth leader permissions and ministry access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_youth': True,
+                'can_edit_content': True
+            }
+        },
+        'Worship Leader': {
+            'description': _('Worship team permissions and music access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_worship': True,
+                'can_edit_content': True
+            }
+        },
+        'Sunday School Teacher': {
+            'description': _('Sunday school teacher permissions and education access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_education': True,
+                'can_edit_content': True
+            }
+        },
+        'Community Outreach': {
+            'description': _('Community outreach permissions and service access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_outreach': True,
+                'can_edit_content': True
+            }
+        },
+        'Technical Support': {
+            'description': _('Technical support permissions and system access'),
+            'permissions': {
+                'can_view_community': True,
+                'can_edit_profile': True,
+                'can_view_members': True,
+                'can_manage_system': True,
+                'can_edit_content': True
             }
         }
     }
     
+    # Create default groups
+    groups = {
+        'Member': {
+            'description': _('Default group for all registered community members'),
+            'default_role': 'Member'
+        },
+        'Elders': {
+            'description': _('Church elders and spiritual leaders'),
+            'default_role': 'Elder'
+        },
+        'Deacons': {
+            'description': _('Church deacons and service leaders'),
+            'default_role': 'Deacon'
+        },
+        'Youth Leaders': {
+            'description': _('Youth ministry leaders and coordinators'),
+            'default_role': 'Youth Leader'
+        },
+        'Worship Team': {
+            'description': _('Music and worship ministry team'),
+            'default_role': 'Worship Leader'
+        },
+        'Sunday School Teachers': {
+            'description': _('Sunday school and children\'s ministry teachers'),
+            'default_role': 'Sunday School Teacher'
+        },
+        'Community Outreach': {
+            'description': _('Community service and outreach coordinators'),
+            'default_role': 'Community Outreach'
+        },
+        'Technical Support': {
+            'description': _('Technical and IT support team'),
+            'default_role': 'Technical Support'
+        }
+    }
+    
     created_roles = {}
+    created_groups = {}
+    
+    # Create roles first
     for role_name, role_data in roles.items():
         role, created = UserRole.objects.get_or_create(
             name=role_name,
             defaults={
                 'description': role_data['description'],
-                'permissions': role_data['permissions']
+                'permissions': role_data['permissions'],
+                'is_active': True
             }
         )
         created_roles[role_name] = role
+        if created:
+            print(f"Created role: {role_name}")
     
-    # Create default groups
-    groups = {
-        'Member': {
-            'description': 'Default group for all registered community members',
-            'default_role': 'Member'
-        },
-        'Elders': {
-            'description': 'Senior community members and spiritual leaders',
-            'default_role': 'Leader'
-        },
-        'Youth': {
-            'description': 'Young community members',
-            'default_role': 'Member'
-        },
-        'Choir': {
-            'description': 'Music ministry and worship team',
-            'default_role': 'Member'
-        },
-        'Tech Support': {
-            'description': 'Technical assistance and digital literacy support',
-            'default_role': 'Moderator'
-        },
-        'Prayer Team': {
-            'description': 'Intercessory prayer and spiritual support',
-            'default_role': 'Member'
-        },
-        'Outreach': {
-            'description': 'Community outreach and evangelism',
-            'default_role': 'Moderator'
-        }
-    }
-    
-    created_groups = {}
+    # Create groups
     for group_name, group_data in groups.items():
         group, created = UserGroup.objects.get_or_create(
             name=group_name,
-            defaults={'description': group_data['description']}
+            defaults={
+                'description': group_data['description'],
+                'is_active': True
+            }
         )
         created_groups[group_name] = group
+        if created:
+            print(f"Created group: {group_name}")
     
-    return {
-        'roles': created_roles,
-        'groups': created_groups
-    }
+    return created_roles, created_groups
 
 
 def assign_user_to_default_group(user: User):
@@ -206,33 +267,50 @@ def assign_user_to_default_group(user: User):
     This should be called after a user profile is created.
     """
     try:
-        # Get the Member group and Member role
-        member_group = UserGroup.objects.get(name='Member', is_active=True)
-        member_role = UserRole.objects.get(name='Member', is_active=True)
+        # Get or create the Member group
+        member_group, created = UserGroup.objects.get_or_create(
+            name='Member',
+            defaults={
+                'description': _('Default group for all registered community members'),
+                'is_active': True
+            }
+        )
         
-        # Check if user is already a member
-        existing_membership = UserGroupMembership.objects.filter(
+        # Get or create the Member role
+        member_role, created = UserRole.objects.get_or_create(
+            name='Member',
+            defaults={
+                'description': _('Basic member permissions and access'),
+                'permissions': {
+                    'can_view_community': True,
+                    'can_edit_profile': True,
+                    'can_view_members': True
+                },
+                'is_active': True
+            }
+        )
+        
+        # Create the membership
+        membership, created = UserGroupMembership.objects.get_or_create(
             user=user,
             group=member_group,
-            is_active=True
-        ).first()
+            defaults={
+                'role': member_role,
+                'is_active': True,
+                'notes': _('Automatically assigned during registration')
+            }
+        )
         
-        if not existing_membership:
-            # Create the membership
-            UserGroupMembership.objects.create(
-                user=user,
-                group=member_group,
-                role=member_role,
-                is_active=True,
-                notes='Automatically assigned as default community member'
-            )
-            return True
-        return False
-    except (UserGroup.DoesNotExist, UserRole.DoesNotExist):
-        # If default groups/roles don't exist, create them first
-        create_default_groups_and_roles()
-        # Try again
-        return assign_user_to_default_group(user)
+        if created:
+            print(f"Assigned user {user.username} to Member group with Member role")
+        else:
+            print(f"User {user.username} already has membership in Member group")
+        
+        return membership
+        
+    except Exception as e:
+        print(f"Error assigning user {user.username} to default group: {e}")
+        return None
 
 
 def assign_existing_users_to_member_group():
@@ -241,38 +319,53 @@ def assign_existing_users_to_member_group():
     This is useful for migrating existing users to the new system.
     """
     try:
-        # Get the Member group and Member role
-        member_group = UserGroup.objects.get(name='Member', is_active=True)
-        member_role = UserRole.objects.get(name='Member', is_active=True)
+        # Get or create the Member group and role
+        member_group, created = UserGroup.objects.get_or_create(
+            name='Member',
+            defaults={
+                'description': _('Default group for all registered community members'),
+                'is_active': True
+            }
+        )
         
-        # Get all active users
-        users = User.objects.filter(is_active=True)
+        member_role, created = UserRole.objects.get_or_create(
+            name='Member',
+            defaults={
+                'description': _('Basic member permissions and access'),
+                'permissions': {
+                    'can_view_community': True,
+                    'can_edit_profile': True,
+                    'can_view_members': True
+                },
+                'is_active': True
+            }
+        )
+        
+        # Get all users who don't have a membership in the Member group
+        users_without_membership = User.objects.filter(
+            ~models.Q(group_memberships__group=member_group)
+        )
+        
         assigned_count = 0
-        
-        for user in users:
-            # Check if user already has a membership in any group
-            existing_membership = UserGroupMembership.objects.filter(
+        for user in users_without_membership:
+            membership, created = UserGroupMembership.objects.get_or_create(
                 user=user,
-                is_active=True
-            ).first()
-            
-            if not existing_membership:
-                # Create the membership
-                UserGroupMembership.objects.create(
-                    user=user,
-                    group=member_group,
-                    role=member_role,
-                    is_active=True,
-                    notes='Automatically assigned existing user to Member group'
-                )
+                group=member_group,
+                defaults={
+                    'role': member_role,
+                    'is_active': True,
+                    'notes': _('Automatically assigned during migration')
+                }
+            )
+            if created:
                 assigned_count += 1
         
+        print(f"Assigned {assigned_count} existing users to Member group")
         return assigned_count
-    except (UserGroup.DoesNotExist, UserRole.DoesNotExist):
-        # If default groups/roles don't exist, create them first
-        create_default_groups_and_roles()
-        # Try again
-        return assign_existing_users_to_member_group()
+        
+    except Exception as e:
+        print(f"Error assigning existing users to Member group: {e}")
+        return 0
 
 
 def export_user_data(user: User, format: str = 'json') -> Dict[str, Any]:

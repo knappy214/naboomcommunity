@@ -1,0 +1,417 @@
+# Afrikaans translations for naboomcommunity package.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the naboomcommunity package.
+msgid ""
+msgstr ""
+"Project-Id-Version: naboomcommunity 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-31 09:00+0000\n"
+"PO-Revision-Date: 2025-08-31 09:00+0000\n"
+"Last-Translator: \n"
+"Language: af\n"
+"Language-Team: af\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: home/models.py:25
+msgid "User Profile"
+msgstr "Gebruiker Profiel"
+
+#: home/models.py:26
+msgid "User Profiles"
+msgstr "Gebruiker Profiele"
+
+#: home/models.py:35
+msgid "Contact phone number"
+msgstr "Kontak telefoonnommer"
+
+#: home/models.py:40
+msgid "User's date of birth"
+msgstr "Gebruiker se geboortedatum"
+
+#: home/models.py:45
+msgid "User's gender identity"
+msgstr "Gebruiker se geslagsidentiteit"
+
+#: home/models.py:50
+msgid "User's physical address"
+msgstr "Gebruiker se fisiese adres"
+
+#: home/models.py:55
+msgid "User's city of residence"
+msgstr "Gebruiker se woonstad"
+
+#: home/models.py:60
+msgid "User's province/state"
+msgstr "Gebruiker se provinsie/staat"
+
+#: home/models.py:65
+msgid "User's postal/zip code"
+msgstr "Gebruiker se poskode"
+
+#: home/models.py:70
+msgid "User's known allergies"
+msgstr "Gebruiker se bekende allergies"
+
+#: home/models.py:75
+msgid "User's medical conditions"
+msgstr "Gebruiker se mediese toestande"
+
+#: home/models.py:80
+msgid "User's current medications"
+msgstr "Gebruiker se huidige medikasie"
+
+#: home/models.py:85
+msgid "Emergency contact person's name"
+msgstr "Noodkontak persoon se naam"
+
+#: home/models.py:90
+msgid "Emergency contact person's phone number"
+msgstr "Noodkontak persoon se telefoonnommer"
+
+#: home/models.py:95
+msgid "Relationship to emergency contact person"
+msgstr "Verhouding tot noodkontak persoon"
+
+#: home/models.py:100
+msgid "User's preferred language"
+msgstr "Gebruiker se voorkeurtaal"
+
+#: home/models.py:105
+msgid "User's timezone"
+msgstr "Gebruiker se tydsone"
+
+#: home/models.py:110
+msgid "Enable email notifications"
+msgstr "E-pos kennisgewings aktiveer"
+
+#: home/models.py:115
+msgid "Enable SMS notifications"
+msgstr "SMS kennisgewings aktiveer"
+
+#: home/models.py:120
+msgid "Enable multi-factor authentication"
+msgstr "Multi-faktor outentifikasie aktiveer"
+
+#: home/models.py:125
+msgid "Date and time when profile was created"
+msgstr "Datum en tyd wanneer profiel geskep is"
+
+#: home/models.py:130
+msgid "Date and time when profile was last updated"
+msgstr "Datum en tyd wanneer profiel laas opgedateer is"
+
+#: home/models.py:140
+msgid "User Group"
+msgstr "Gebruiker Groep"
+
+#: home/models.py:141
+msgid "User Groups"
+msgstr "Gebruiker Groepe"
+
+#: home/models.py:145
+msgid "Name of the user group"
+msgstr "Naam van die gebruiker groep"
+
+#: home/models.py:150
+msgid "Description of the user group"
+msgstr "Beskrywing van die gebruiker groep"
+
+#: home/models.py:155
+msgid "Whether the group is currently active"
+msgstr "Of die groep tans aktief is"
+
+#: home/models.py:160
+msgid "Date and time when group was created"
+msgstr "Datum en tyd wanneer groep geskep is"
+
+#: home/models.py:165
+msgid "Date and time when group was last updated"
+msgstr "Datum en tyd wanneer groep laas opgedateer is"
+
+#: home/models.py:175
+msgid "User Role"
+msgstr "Gebruiker Rol"
+
+#: home/models.py:176
+msgid "User Roles"
+msgstr "Gebruiker Rolle"
+
+#: home/models.py:180
+msgid "Name of the user role"
+msgstr "Naam van die gebruiker rol"
+
+#: home/models.py:185
+msgid "Description of the user role"
+msgstr "Beskrywing van die gebruiker rol"
+
+#: home/models.py:190
+msgid "JSON field containing role permissions"
+msgstr "JSON veld wat rol regte bevat"
+
+#: home/models.py:195
+msgid "Whether the role is currently active"
+msgstr "Of die rol tans aktief is"
+
+#: home/models.py:200
+msgid "Date and time when role was created"
+msgstr "Datum en tyd wanneer rol geskep is"
+
+#: home/models.py:205
+msgid "Date and time when role was last updated"
+msgstr "Datum en tyd wanneer rol laas opgedateer is"
+
+#: home/models.py:215
+msgid "User Group Membership"
+msgstr "Gebruiker Groep Lidmaatskap"
+
+#: home/models.py:216
+msgid "User Group Memberships"
+msgstr "Gebruiker Groep Lidmaatskappe"
+
+#: home/models.py:220
+msgid "User who is a member of the group"
+msgstr "Gebruiker wat 'n lid van die groep is"
+
+#: home/models.py:225
+msgid "Group that the user belongs to"
+msgstr "Groep waarvan die gebruiker 'n lid is"
+
+#: home/models.py:230
+msgid "Role assigned to the user in this group"
+msgstr "Rol toegeken aan die gebruiker in hierdie groep"
+
+#: home/models.py:235
+msgid "Date and time when user joined the group"
+msgstr "Datum en tyd wanneer gebruiker by die groep aangesluit het"
+
+#: home/models.py:240
+msgid "Whether the membership is currently active"
+msgstr "Of die lidmaatskap tans aktief is"
+
+#: home/models.py:245
+msgid "Additional notes about the membership"
+msgstr "Bykomende notas oor die lidmaatskap"
+
+#: home/models.py:250
+msgid "Date and time when membership was created"
+msgstr "Datum en tyd wanneer lidmaatskap geskep is"
+
+#: home/models.py:255
+msgid "Date and time when membership was last updated"
+msgstr "Datum en tyd wanneer lidmaatskap laas opgedateer is"
+
+#: home/models.py:265
+msgid "User"
+msgstr "Gebruiker"
+
+#: home/models.py:270
+msgid "Phone"
+msgstr "Telefoon"
+
+#: home/models.py:275
+msgid "Date of birth"
+msgstr "Geboortedatum"
+
+#: home/models.py:280
+msgid "Gender"
+msgstr "Geslag"
+
+#: home/models.py:285
+msgid "Address"
+msgstr "Adres"
+
+#: home/models.py:290
+msgid "City"
+msgstr "Stad"
+
+#: home/models.py:295
+msgid "Province"
+msgstr "Provinsie"
+
+#: home/models.py:300
+msgid "Postal code"
+msgstr "Poskode"
+
+#: home/models.py:305
+msgid "Allergies"
+msgstr "Allergies"
+
+#: home/models.py:310
+msgid "Medical conditions"
+msgstr "Mediese toestande"
+
+#: home/models.py:315
+msgid "Current medications"
+msgstr "Huidige medikasie"
+
+#: home/models.py:320
+msgid "Emergency contact name"
+msgstr "Noodkontak naam"
+
+#: home/models.py:325
+msgid "Emergency contact phone"
+msgstr "Noodkontak telefoon"
+
+#: home/models.py:330
+msgid "Emergency contact relationship"
+msgstr "Noodkontak verhouding"
+
+#: home/models.py:335
+msgid "Preferred language"
+msgstr "Voorkeurtaal"
+
+#: home/models.py:340
+msgid "Timezone"
+msgstr "Tydsone"
+
+#: home/models.py:345
+msgid "Email notifications"
+msgstr "E-pos kennisgewings"
+
+#: home/models.py:350
+msgid "SMS notifications"
+msgstr "SMS kennisgewings"
+
+#: home/models.py:355
+msgid "MFA enabled"
+msgstr "MFA geaktiveer"
+
+#: home/models.py:360
+msgid "Created at"
+msgstr "Geskep op"
+
+#: home/models.py:365
+msgid "Updated at"
+msgstr "Opgedateer op"
+
+#: home/models.py:370
+msgid "Name"
+msgstr "Naam"
+
+#: home/models.py:375
+msgid "Description"
+msgstr "Beskrywing"
+
+#: home/models.py:380
+msgid "Is active"
+msgstr "Is aktief"
+
+#: home/models.py:385
+msgid "Permissions"
+msgstr "Regte"
+
+#: home/models.py:390
+msgid "Group"
+msgstr "Groep"
+
+#: home/models.py:395
+msgid "Role"
+msgstr "Rol"
+
+#: home/models.py:400
+msgid "Joined at"
+msgstr "Aangesluit op"
+
+#: home/models.py:405
+msgid "Notes"
+msgstr "Notas"
+
+#: home/models.py:410
+msgid "Member"
+msgstr "Lid"
+
+#: home/models.py:415
+msgid "Elders"
+msgstr "Ouderlinge"
+
+#: home/models.py:420
+msgid "Deacons"
+msgstr "Diakens"
+
+#: home/models.py:425
+msgid "Youth Leaders"
+msgstr "Jeugleiers"
+
+#: home/models.py:430
+msgid "Worship Team"
+msgstr "Aanbidding Span"
+
+#: home/models.py:435
+msgid "Sunday School Teachers"
+msgstr "Sondagskool Onderwysers"
+
+#: home/models.py:440
+msgid "Community Outreach"
+msgstr "Gemeenskaps Uitreik"
+
+#: home/models.py:445
+msgid "Technical Support"
+msgstr "Tegniese Ondersteuning"
+
+#: home/models.py:450
+msgid "Default group for all registered community members"
+msgstr "Verstek groep vir alle geregistreerde gemeenskapslede"
+
+#: home/models.py:455
+msgid "Church elders and spiritual leaders"
+msgstr "Kerk ouderlinge en geestelike leiers"
+
+#: home/models.py:460
+msgid "Church deacons and service leaders"
+msgstr "Kerk diakens en diensleiers"
+
+#: home/models.py:465
+msgid "Youth ministry leaders and coordinators"
+msgstr "Jeugbediening leiers en koördineerders"
+
+#: home/models.py:470
+msgid "Music and worship ministry team"
+msgstr "Musiek en aanbidding bediening span"
+
+#: home/models.py:475
+msgid "Sunday school and children's ministry teachers"
+msgstr "Sondagskool en kinders bediening onderwysers"
+
+#: home/models.py:480
+msgid "Community service and outreach coordinators"
+msgstr "Gemeenskaps diens en uitreik koördineerders"
+
+#: home/models.py:485
+msgid "Technical and IT support team"
+msgstr "Tegniese en IT ondersteuning span"
+
+#: home/models.py:490
+msgid "Basic member permissions and access"
+msgstr "Basiese lid regte en toegang"
+
+#: home/models.py:495
+msgid "Elder-level permissions and leadership access"
+msgstr "Ouderling-vlak regte en leierskap toegang"
+
+#: home/models.py:500
+msgid "Deacon-level permissions and service access"
+msgstr "Diaken-vlak regte en diens toegang"
+
+#: home/models.py:505
+msgid "Youth leader permissions and ministry access"
+msgstr "Jeugleier regte en bediening toegang"
+
+#: home/models.py:510
+msgid "Worship team permissions and music access"
+msgstr "Aanbidding span regte en musiek toegang"
+
+#: home/models.py:515
+msgid "Sunday school teacher permissions and education access"
+msgstr "Sondagskool onderwyser regte en onderwys toegang"
+
+#: home/models.py:520
+msgid "Community outreach permissions and service access"
+msgstr "Gemeenskaps uitreik regte en diens toegang"
+
+#: home/models.py:525
+msgid "Technical support permissions and system access"
+msgstr "Tegniese ondersteuning regte en stelsel toegang"
