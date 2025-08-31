@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
+    "wagtail.locales",
+    "wagtail.contrib.simple_translation",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
@@ -83,6 +85,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -156,6 +159,15 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+WAGTAIL_I18N_ENABLED = True
+USE_L10N = True
+
+# Configure available languages
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+    ("en", "English"),
+    ("af", "Afrikaans"),
+    # Add more languages as needed
+]
 
 USE_TZ = True
 
