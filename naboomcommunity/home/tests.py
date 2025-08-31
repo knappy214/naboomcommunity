@@ -357,3 +357,179 @@ class AdminTest(TestCase):
         """Test user role admin interface."""
         response = self.client.get('/admin/home/userrole/')
         self.assertEqual(response.status_code, 200)
+
+
+class UserRequirementsTest(TestCase):
+    """Test that all user requirements are met."""
+    
+    def setUp(self):
+        """Set up test data."""
+        # Create default groups and roles
+        from .utils import create_default_groups_and_roles
+        self.default_data = create_default_groups_and_roles()
+        
+        # Get the Member group and Member role
+        self.member_group = UserGroup.objects.get(name='Member')
+        self.member_role = UserRole.objects.get(name='Member')
+    
+    def test_requirement_1_user_profile_creation(self):
+        """Test that every user that registers must have a profile."""
+        # Create a new user
+        user = User.objects.create_user(
+            username='testuser_profile',
+            email='testprofile@example.com',
+            password='testpass123'
+        )
+        
+        # Check that profile was automatically created
+        self.assertTrue(hasattr(user, 'profile'))
+        self.assertIsInstance(user.profile, UserProfile)
+        
+        # Check that profile has the user reference
+        self.assertEqual(user.profile.user, user)
+    
+    def test_requirement_2_multiple_group_memberships(self):
+        """Test that every user can belong to multiple groups with a single role for each group."""
+        # Create a user
+        user = User.objects.create_user(
+            username='testuser_groups',
+            email='testgroups@example.com',
+            password='testpass123'
+        )
+        
+        # Create additional groups
+        youth_group = UserGroup.objects.get(name='Youth')
+        choir_group = UserGroup.objects.get(name='Choir')
+        
+        # Assign user to multiple groups with different roles
+        membership1 = UserGroupMembership.objects.create(
+            user=user,
+            group=self.member_group,
+            role=self.member_role,
+            is_active=True
+        )
+        
+        membership2 = UserGroupMembership.objects.create(
+            user=user,
+            group=youth_group,
+            role=self.member_role,
+            is_active=True
+        )
+        
+        membership3 = UserGroupMembership.objects.create(
+            user=user,
+            group=choir_group,
+            role=self.member_role,
+            is_active=True
+        )
+        
+        # Verify user has multiple memberships
+        user_memberships = user.group_memberships.filter(is_active=True)
+        self.assertEqual(user_memberships.count(), 3)
+        
+        # Verify each membership has a role
+        for membership in user_memberships:
+            self.assertIsNotNone(membership.role)
+            self.assertIsNotNone(membership.group)
+    
+    def test_requirement_3_default_member_group_assignment(self):
+        """Test that every user registered is by default a member of Member group with Member role."""
+        # Create a new user
+        user = User.objects.create_user(
+            username='testuser_default',
+            email='testdefault@example.com',
+            password='testpass123'
+        )
+        
+        # Check that user was automatically assigned to Member group
+        member_membership = UserGroupMembership.objects.filter(
+            user=user,
+            group=self.member_group,
+            role=self.member_role,
+            is_active=True
+        ).first()
+        
+        self.assertIsNotNone(member_membership)
+        self.assertEqual(member_membership.group.name, 'Member')
+        self.assertEqual(member_membership.role.name, 'Member')
+        self.assertTrue(member_membership.is_active)
+    
+    def test_existing_users_assigned_to_member_group(self):
+        """Test that existing users can be assigned to Member group."""
+        # Create a user without automatic assignment
+        user = User.objects.create_user(
+            username='testuser_existing',
+            email='testexisting@example.com',
+            password='testpass123'
+        )
+        
+        # Remove any existing memberships
+        UserGroupMembership.objects.filter(user=user).delete()
+        
+        # Assign user to Member group using utility function
+        from .utils import assign_user_to_default_group
+        result = assign_user_to_default_group(user)
+        
+        self.assertTrue(result)
+        
+        # Verify membership was created
+        membership = UserGroupMembership.objects.filter(
+            user=user,
+            group=self.member_group,
+            role=self.member_role,
+            is_active=True
+        ).first()
+        
+        self.assertIsNotNone(membership)
+        self.assertEqual(membership.group.name, 'Member')
+        self.assertEqual(membership.role.name, 'Member')
+    
+    def test_unique_group_membership_constraint(self):
+        """Test that a user can only have one active membership per group."""
+        user = User.objects.create_user(
+            username='testuser_unique',
+            email='testunique@example.com',
+            password='testpass123'
+        )
+        
+        # Try to create duplicate membership in Member group
+        membership1 = UserGroupMembership.objects.create(
+            user=user,
+            group=self.member_group,
+            role=self.member_role,
+            is_active=True
+        )
+        
+        # This should fail due to unique constraint
+        with self.assertRaises(Exception):
+            UserGroupMembership.objects.create(
+                user=user,
+                group=self.member_group,
+                role=self.member_role,
+                is_active=True
+            )
+    
+    def test_user_profile_fields_accessible(self):
+        """Test that user profile fields are properly accessible."""
+        user = User.objects.create_user(
+            username='testuser_fields',
+            email='testfields@example.com',
+            password='testpass123'
+        )
+        
+        # Check profile fields are accessible
+        self.assertEqual(user.profile.phone, '')
+        self.assertEqual(user.profile.preferred_language, 'en')
+        self.assertEqual(user.profile.email_notifications, True)
+        
+        # Update profile fields
+        user.profile.phone = '+27 82 123 4567'
+        user.profile.city = 'Pretoria'
+        user.profile.preferred_language = 'af'
+        user.profile.save()
+        
+        # Verify changes
+        user.refresh_from_db()
+        self.assertEqual(user.profile.phone, '+27 82 123 4567')
+        self.assertEqual(user.profile.city, 'Pretoria')
+        self.assertEqual(user.profile.preferred_language, 'af')

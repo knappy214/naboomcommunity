@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
-from .models import UserProfile, UserGroup, UserRole
+from .models import UserProfile, UserGroup, UserRole, UserGroupMembership
 
 
 def validate_phone_number(phone: str) -> bool:
@@ -156,6 +156,10 @@ def create_default_groups_and_roles():
     
     # Create default groups
     groups = {
+        'Member': {
+            'description': 'Default group for all registered community members',
+            'default_role': 'Member'
+        },
         'Elders': {
             'description': 'Senior community members and spiritual leaders',
             'default_role': 'Leader'
@@ -194,6 +198,81 @@ def create_default_groups_and_roles():
         'roles': created_roles,
         'groups': created_groups
     }
+
+
+def assign_user_to_default_group(user: User):
+    """
+    Automatically assign a new user to the default Member group with Member role.
+    This should be called after a user profile is created.
+    """
+    try:
+        # Get the Member group and Member role
+        member_group = UserGroup.objects.get(name='Member', is_active=True)
+        member_role = UserRole.objects.get(name='Member', is_active=True)
+        
+        # Check if user is already a member
+        existing_membership = UserGroupMembership.objects.filter(
+            user=user,
+            group=member_group,
+            is_active=True
+        ).first()
+        
+        if not existing_membership:
+            # Create the membership
+            UserGroupMembership.objects.create(
+                user=user,
+                group=member_group,
+                role=member_role,
+                is_active=True,
+                notes='Automatically assigned as default community member'
+            )
+            return True
+        return False
+    except (UserGroup.DoesNotExist, UserRole.DoesNotExist):
+        # If default groups/roles don't exist, create them first
+        create_default_groups_and_roles()
+        # Try again
+        return assign_user_to_default_group(user)
+
+
+def assign_existing_users_to_member_group():
+    """
+    Assign all existing users to the Member group if they don't already have a membership.
+    This is useful for migrating existing users to the new system.
+    """
+    try:
+        # Get the Member group and Member role
+        member_group = UserGroup.objects.get(name='Member', is_active=True)
+        member_role = UserRole.objects.get(name='Member', is_active=True)
+        
+        # Get all active users
+        users = User.objects.filter(is_active=True)
+        assigned_count = 0
+        
+        for user in users:
+            # Check if user already has a membership in any group
+            existing_membership = UserGroupMembership.objects.filter(
+                user=user,
+                is_active=True
+            ).first()
+            
+            if not existing_membership:
+                # Create the membership
+                UserGroupMembership.objects.create(
+                    user=user,
+                    group=member_group,
+                    role=member_role,
+                    is_active=True,
+                    notes='Automatically assigned existing user to Member group'
+                )
+                assigned_count += 1
+        
+        return assigned_count
+    except (UserGroup.DoesNotExist, UserRole.DoesNotExist):
+        # If default groups/roles don't exist, create them first
+        create_default_groups_and_roles()
+        # Try again
+        return assign_existing_users_to_member_group()
 
 
 def export_user_data(user: User, format: str = 'json') -> Dict[str, Any]:

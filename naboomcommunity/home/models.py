@@ -78,6 +78,9 @@ def create_user_profile(sender, instance, created, **kwargs):
     """Create a UserProfile when a new User is created."""
     if created:
         UserProfile.objects.create(user=instance)
+        # Automatically assign user to Member group with Member role
+        from .utils import assign_user_to_default_group
+        assign_user_to_default_group(instance)
 
 
 @receiver(post_save, sender=User)
