@@ -241,3 +241,63 @@ class UserGroupMembershipForm(forms.ModelForm):
                 )
         
         return cleaned_data
+
+
+class UserProfileAdminForm(forms.ModelForm):
+    """Custom form for UserProfile admin that makes user field read-only."""
+    
+    # Override the user field completely
+    user_display = forms.CharField(
+        label="User",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly',
+            'class': 'readonly-field',
+            'style': 'background-color: #f8f9fa; color: #6c757d; cursor: not-allowed; border: 1px solid #dee2e6; padding: 8px; width: 100%;'
+        })
+    )
+    
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user', 'phone', 'date_of_birth', 'gender', 'address', 
+            'city', 'province', 'postal_code', 'allergies', 
+            'medical_conditions', 'current_medications',
+            'emergency_contact_name', 'emergency_contact_phone', 
+            'emergency_contact_relationship', 'preferred_language',
+            'timezone', 'email_notifications', 'sms_notifications', 'mfa_enabled'
+        ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Make the user field read-only and hide it
+        if 'user' in self.fields:
+            self.fields['user'].widget = forms.HiddenInput()
+            self.fields['user'].required = False
+        
+        # Set the user display field value for existing profiles
+        if self.instance and self.instance.pk:
+            if hasattr(self.instance, 'user') and self.instance.user:
+                # Display username and email in a user-friendly format
+                user_info = f"{self.instance.user.username}"
+                if self.instance.user.email:
+                    user_info += f" ({self.instance.user.email})"
+                if self.instance.user.first_name or self.instance.user.last_name:
+                    full_name = f"{self.instance.user.first_name or ''} {self.instance.user.last_name or ''}".strip()
+                    if full_name:
+                        user_info += f" - {full_name}"
+                
+                self.fields['user_display'].initial = user_info
+                self.fields['user_display'].help_text = "This field cannot be changed. The user is automatically assigned when the profile is created."
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ensure the user field is preserved for existing profiles
+        if self.instance and self.instance.pk:
+            cleaned_data['user'] = self.instance.user
+        return cleaned_data

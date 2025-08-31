@@ -305,3 +305,39 @@ a:hover {
         border: 2px solid black;
     }
 }
+
+/* Admin interface improvements */
+.readonly-field {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.readonly-field:focus {
+    box-shadow: none !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Wagtail admin improvements */
+.w-field__input[readonly] {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+}
+
+.w-field__input[disabled] {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+}
+
+/* User profile list improvements */
+.user-profile-list .w-field__input {
+    font-weight: 500;
+}
+
+.user-profile-list .user-email {
+    color: #007bff;
+    font-style: italic;
+}

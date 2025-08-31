@@ -2,19 +2,23 @@ from wagtail import hooks
 from wagtail.admin.viewsets.model import ModelViewSet
 from wagtail.admin.viewsets import ViewSetGroup
 from .models import UserProfile, UserGroup, UserRole, UserGroupMembership
-
+from .forms import UserProfileAdminForm
 
 class UserProfileViewSet(ModelViewSet):
     model = UserProfile
     menu_label = "User Profiles"
     icon = "user"
     list_display = ("user", "phone", "city", "province", "preferred_language", "created_at")
-    search_fields = ("user__username", "user__first_name", "user__last_name", "phone", "city")
+    list_filter = ("preferred_language", "city", "province", "created_at")
+    search_fields = ("user__username", "user__first_name", "user__last_name", "user__email", "phone", "city")
     ordering = ("-created_at",)
     
-    # Specify form fields to avoid the ImproperlyConfigured error
+    # Use custom form to make user field read-only
+    form_class = UserProfileAdminForm
+    
+    # Specify form fields - only include actual model fields
     form_fields = [
-        "user", "phone", "date_of_birth", "gender", "address", 
+        "phone", "date_of_birth", "gender", "address", 
         "city", "province", "postal_code", "allergies", 
         "medical_conditions", "current_medications",
         "emergency_contact_name", "emergency_contact_phone", 
@@ -28,6 +32,7 @@ class UserGroupViewSet(ModelViewSet):
     menu_label = "User Groups"
     icon = "group"
     list_display = ("name", "description", "is_active", "created_at")
+    list_filter = ("is_active", "created_at")
     search_fields = ("name", "description")
     ordering = ("name",)
     
@@ -40,6 +45,7 @@ class UserRoleViewSet(ModelViewSet):
     menu_label = "User Roles"
     icon = "tag"
     list_display = ("name", "description", "is_active", "created_at")
+    list_filter = ("is_active", "created_at")
     search_fields = ("name", "description")
     ordering = ("name",)
     
@@ -52,8 +58,8 @@ class UserGroupMembershipViewSet(ModelViewSet):
     menu_label = "Group Memberships"
     icon = "user"
     list_display = ("user", "group", "role", "joined_at", "is_active")
+    list_filter = ("is_active", "group", "role", "joined_at")
     search_fields = ("user__username", "group__name", "role__name")
-    list_filter = ("is_active", "group", "role")
     ordering = ("-joined_at",)
     
     # Specify form fields - remove auto-generated fields
