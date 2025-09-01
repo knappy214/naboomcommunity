@@ -12,6 +12,7 @@ urlpatterns = [
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("api/v2/", api_router.urls),
+    path("api/", include("api.urls")),
     path("", include(wagtail_urls)),
     path("", include("home.urls")),
     # Language switching
