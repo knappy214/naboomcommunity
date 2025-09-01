@@ -4,11 +4,16 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from wagtail import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
 
 from .api import api_router
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    # Wagtail admin (replaces Django admin)
+    path("admin/", include(wagtailadmin_urls)),
+    
+    # Django admin (moved to /django-admin/ to avoid conflicts)
+    path("django-admin/", admin.site.urls),
 
     # Wagtail API v2 (content)
     path("api/v2/", api_router.urls),

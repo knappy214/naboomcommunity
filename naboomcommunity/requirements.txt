@@ -4,5 +4,7 @@ djangorestframework
 django-cors-headers
 djangorestframework-simplejwt
 drf-spectacular
+django-storages
+boto3
 pytest
 pytest-django

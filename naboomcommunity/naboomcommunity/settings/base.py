@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "storages",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -198,22 +199,67 @@ STATICFILES_DIRS = [
     os.path.join(PROJECT_DIR, "static"),
 ]
 
+# MinIO/S3 Storage Configuration
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'immunothreat')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'INikbgTflu34yWjJHZYi')
+WAGTAILIMAGES_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp']
+WAGTAILDOCS_SERVE_METHOD = 'redirect'  
+
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'naboomneighbornet-media')
+AWS_S3_ENDPOINT_URL = 'https://s3.naboomneighbornet.net.za'
+AWS_S3_CUSTOM_DOMAIN = 's3.naboomneighbornet.net.za'
+AWS_DEFAULT_ACL = 'public-read'
+
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+AWS_S3_OBJECT_PARAMETERS = { 
+    'CacheControl': 'max-age=86400', 
+    'ContentDisposition': 'inline', 
+}
+WAGTAIL_STORAGES_DOCUMENTS_FRONTENDCACHE = {
+    'default': {
+        'BACKEND': 'wagtail.contrib.frontend_cache.backends.HTTPBackend',
+        'LOCATION': 'https://s3.naboomneighbornet.net.za',
+    }
+}
+
+# Wagtail document storage configuration
+WAGTAILDOCS_STORAGE_BACKEND = 'naboomcommunity.custom_storages.DocumentStorage'
+
+
+
+# Static files configuration for MinIO
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
+STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/static/"
 
+# Media files configuration for MinIO
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/media/"
 
-# Default storage settings
+# MinIO/S3 Storage Configuration (Legacy Django settings for compatibility)
+DEFAULT_FILE_STORAGE = 'naboomcommunity.custom_storages.MediaStorage'
+STATICFILES_STORAGE = 'naboomcommunity.custom_storages.StaticStorage'
+
+# Default storage settings (Django 4.2+ format)
 # See https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-STORAGES
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "naboomcommunity.custom_storages.MediaStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "naboomcommunity.custom_storages.StaticStorage",
     },
 }
+
+# Wagtail-specific storage configuration
+WAGTAILIMAGES_FORMAT_CONVERSIONS = {
+    'bmp': 'jpeg',
+    'webp': 'webp',
+}
+
+# Document storage for Wagtail documents
+WAGTAILDOCS_SERVE_METHOD = 'redirect'  # Use signed URLs for private documents
 
 # Django sets a maximum of 1000 fields per form by default, but particularly complex page models
 # can exceed this limit within Wagtail's page editor.
@@ -224,7 +270,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 # Wagtail settings
 
-WAGTAIL_SITE_NAME = "naboomcommunity"
+WAGTAIL_SITE_NAME = "Naboom Community"
+WAGTAILADMIN_BASE_URL = "https://naboomneighbornet.net.za"
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
@@ -236,7 +283,7 @@ WAGTAILSEARCH_BACKENDS = {
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
-WAGTAILADMIN_BASE_URL = "https://naboomneighbornet.net.za"
+# (This is now set above in the Wagtail settings section)
 
 # Allowed file extensions for documents in the document library.
 # This can be omitted to allow all files, but note that this may present a security risk
