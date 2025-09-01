@@ -81,10 +81,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "wagtail.api.v2",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+]
+
+# Enable Wagtail API v2 and OpenAPI schema generation
+INSTALLED_APPS += [
+    "wagtail.api.v2",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -168,12 +173,11 @@ USE_I18N = True
 WAGTAIL_I18N_ENABLED = True
 USE_L10N = True
 
-# Configure available languages
-WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+LANGUAGES = [
     ("en", "English"),
     ("af", "Afrikaans"),
-    # Add more languages as needed
 ]
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
 # Add this line for Django to find translation files
 LOCALE_PATHS = [
     os.path.join(PROJECT_DIR, 'home', 'locale'),
@@ -248,6 +252,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 CORS_ALLOWED_ORIGINS = [

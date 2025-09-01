@@ -3,5 +3,6 @@ wagtail>=7.1,<7.2
 djangorestframework
 django-cors-headers
 djangorestframework-simplejwt
+drf-spectacular
 pytest
 pytest-django
