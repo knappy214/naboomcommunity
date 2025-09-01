@@ -1,20 +1,20 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .viewsets import PageViewSet, health
-from .auth_views import (
-    RegisterView,
-    PasswordResetRequestView,
-    PasswordResetConfirmView,
-    EmailTokenObtainPairView,
-)
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-router = DefaultRouter()
-router.register(r"pages", PageViewSet, basename="pages")
+from .auth_views import (
+    EmailTokenObtainPairView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    RegisterView,
+)
+from .viewsets import health
+
+router = DefaultRouter()  # no custom viewsets; pages served via Wagtail API v2
 
 urlpatterns = [
     path(
-        "v1/",
+        "",
         include(
             [
                 path("", include(router.urls)),
@@ -27,8 +27,8 @@ urlpatterns = [
                     "auth/password-reset/confirm",
                     PasswordResetConfirmView.as_view(),
                 ),
+                path("health/", health),
             ]
         ),
     ),
-    path("health/", health),
 ]
