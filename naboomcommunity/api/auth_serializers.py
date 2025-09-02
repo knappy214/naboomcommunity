@@ -37,14 +37,26 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = (
-        User.EMAIL_FIELD if hasattr(User, "EMAIL_FIELD") else "username"
-    )
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add email field to the serializer
+        self.fields['email'] = serializers.EmailField(required=False)
+        # Make username field optional since we'll set it in validate
+        self.fields['username'].required = False
+    
     def validate(self, attrs):
-        email = attrs.get("email") or attrs.get("username")
-        if self.username_field != "email" and email:
-            attrs["username"] = email
+        email = attrs.get("email")
+        if email:
+            # Find user by email and set the username field for authentication
+            try:
+                user = User.objects.get(email__iexact=email)
+                attrs["username"] = user.username
+            except User.DoesNotExist:
+                # If user not found, set a dummy username to prevent KeyError
+                attrs["username"] = "nonexistent_user"
+        # Ensure username field is always present
+        if "username" not in attrs:
+            attrs["username"] = attrs.get("email", "")
         return super().validate(attrs)
 
 

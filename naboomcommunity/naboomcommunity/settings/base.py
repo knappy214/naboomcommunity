@@ -206,7 +206,7 @@ WAGTAILIMAGES_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp']
 WAGTAILDOCS_SERVE_METHOD = 'redirect'  
 
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'naboomneighbornet-media')
-AWS_S3_ENDPOINT_URL = 'https://s3.naboomneighbornet.net.za'
+AWS_S3_ENDPOINT_URL = 'https://s3.r'
 AWS_S3_CUSTOM_DOMAIN = 's3.naboomneighbornet.net.za'
 AWS_DEFAULT_ACL = 'public-read'
 
@@ -231,7 +231,8 @@ WAGTAILDOCS_STORAGE_BACKEND = 'naboomcommunity.custom_storages.DocumentStorage'
 
 # Static files configuration for MinIO
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/static/"
+# Temporarily serve static files locally to fix admin styling
+STATIC_URL = "/static/"
 
 # Media files configuration for MinIO
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -239,7 +240,8 @@ MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/media/"
 
 # MinIO/S3 Storage Configuration (Legacy Django settings for compatibility)
 DEFAULT_FILE_STORAGE = 'naboomcommunity.custom_storages.MediaStorage'
-STATICFILES_STORAGE = 'naboomcommunity.custom_storages.StaticStorage'
+# Temporarily disable S3 static storage to serve admin CSS locally
+# STATICFILES_STORAGE = 'naboomcommunity.custom_storages.StaticStorage'
 
 # Default storage settings (Django 4.2+ format)
 # See https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-STORAGES
@@ -248,7 +250,7 @@ STORAGES = {
         "BACKEND": "naboomcommunity.custom_storages.MediaStorage",
     },
     "staticfiles": {
-        "BACKEND": "naboomcommunity.custom_storages.StaticStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -305,6 +307,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8081",
+    "http://localhost:5173",  # Vue development server
 ]
 
 # Email and frontend configuration
