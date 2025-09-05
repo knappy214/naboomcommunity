@@ -1,1 +1,1 @@
-# Management commands package for home app
+# Management commands

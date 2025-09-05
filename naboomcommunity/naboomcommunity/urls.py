@@ -5,6 +5,8 @@ from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.images.views.serve import serve
+from home.views import serve_image
 
 from .api import api_router
 
@@ -30,6 +32,9 @@ urlpatterns = [
 
     # Custom app views
     path("", include("home.urls")),
+
+    # Custom image serving for S3
+    re_path(r'^images/([^/]*)/(\d*)/([^/]*)/[^/]*$', serve_image, name='wagtailimages_serve'),
 
     # Keep below API routes
     re_path(r"^", include(wagtail_urls)),

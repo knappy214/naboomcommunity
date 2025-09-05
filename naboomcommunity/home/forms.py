@@ -89,7 +89,7 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = (
-            'phone', 'date_of_birth', 'gender', 'address', 'city', 'province', 'postal_code',
+            'avatar', 'phone', 'date_of_birth', 'gender', 'address', 'city', 'province', 'postal_code',
             'preferred_language', 'timezone', 'email_notifications', 'sms_notifications'
         )
         widgets = {
@@ -152,7 +152,7 @@ class UserGroupForm(forms.ModelForm):
     """
     class Meta:
         model = UserGroup
-        fields = ('name', 'description', 'is_active')
+        fields = ('name', 'description')
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
@@ -160,8 +160,7 @@ class UserGroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if field_name != 'is_active':
-                field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['class'] = 'form-control'
 
 
 class UserRoleForm(forms.ModelForm):
@@ -170,7 +169,7 @@ class UserRoleForm(forms.ModelForm):
     """
     class Meta:
         model = UserRole
-        fields = ('name', 'description', 'permissions', 'is_active')
+        fields = ('name', 'description', 'permissions')
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'permissions': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
@@ -179,8 +178,7 @@ class UserRoleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if field_name != 'is_active':
-                field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['class'] = 'form-control'
         
         # Add help text for permissions field
         self.fields['permissions'].help_text = (
@@ -205,10 +203,8 @@ class UserGroupMembershipForm(forms.ModelForm):
     """
     class Meta:
         model = UserGroupMembership
-        fields = ('user', 'group', 'role', 'is_active', 'notes')
-        widgets = {
-            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-        }
+        fields = ('user', 'group', 'role', 'is_active')
+        widgets = {}
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -244,29 +240,11 @@ class UserGroupMembershipForm(forms.ModelForm):
 
 
 class UserProfileAdminForm(forms.ModelForm):
-    """Custom form for UserProfile admin that makes user field read-only."""
-    
-    # Override the user field completely
-    user_display = forms.CharField(
-        label="User",
-        required=False,
-        widget=forms.TextInput(attrs={
-            'readonly': 'readonly',
-            'class': 'readonly-field',
-            'style': 'background-color: #f8f9fa; color: #6c757d; cursor: not-allowed; border: 1px solid #dee2e6; padding: 8px; width: 100%;'
-        })
-    )
+    """Admin form for UserProfile that properly handles avatar field."""
     
     class Meta:
         model = UserProfile
-        fields = [
-            'user', 'phone', 'date_of_birth', 'gender', 'address', 
-            'city', 'province', 'postal_code', 'allergies', 
-            'medical_conditions', 'current_medications',
-            'emergency_contact_name', 'emergency_contact_phone', 
-            'emergency_contact_relationship', 'preferred_language',
-            'timezone', 'email_notifications', 'sms_notifications', 'mfa_enabled'
-        ]
+        fields = '__all__'  # Include all fields including avatar
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'address': forms.Textarea(attrs={'rows': 3}),
@@ -275,29 +253,13 @@ class UserProfileAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Make the user field read-only and hide it
+        # Make the user field read-only
         if 'user' in self.fields:
-            self.fields['user'].widget = forms.HiddenInput()
-            self.fields['user'].required = False
+            self.fields['user'].widget.attrs['readonly'] = True
+            self.fields['user'].help_text = "This field cannot be changed. The user is automatically assigned when the profile is created."
         
-        # Set the user display field value for existing profiles
-        if self.instance and self.instance.pk:
-            if hasattr(self.instance, 'user') and self.instance.user:
-                # Display username and email in a user-friendly format
-                user_info = f"{self.instance.user.username}"
-                if self.instance.user.email:
-                    user_info += f" ({self.instance.user.email})"
-                if self.instance.user.first_name or self.instance.user.last_name:
-                    full_name = f"{self.instance.user.first_name or ''} {self.instance.user.last_name or ''}".strip()
-                    if full_name:
-                        user_info += f" - {full_name}"
-                
-                self.fields['user_display'].initial = user_info
-                self.fields['user_display'].help_text = "This field cannot be changed. The user is automatically assigned when the profile is created."
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        # Ensure the user field is preserved for existing profiles
-        if self.instance and self.instance.pk:
-            cleaned_data['user'] = self.instance.user
-        return cleaned_data
+        # Configure avatar field for proper image selection
+        if 'avatar' in self.fields:
+            # Use a simple file input for now - Wagtail will handle the image chooser
+            self.fields['avatar'].help_text = "Select an image for the user's avatar"
+            self.fields['avatar'].required = False

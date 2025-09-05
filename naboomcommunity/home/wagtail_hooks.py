@@ -12,6 +12,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import UserProfile, UserGroup, UserRole, UserGroupMembership
 from .forms import UserProfileAdminForm
 
+
+
+
+
 # Language switcher hook
 @hooks.register('construct_admin_menu')
 def add_language_switcher(request, menu_items):
@@ -66,44 +70,12 @@ class UserProfileViewSet(ModelViewSet):
     search_fields = ("user__username", "user__first_name", "user__last_name", "user__email", "phone", "city")
     ordering = ("-created_at",)
     
-    # Use custom form to make user field read-only
-    form_class = UserProfileAdminForm
-    
-    # Define panels for the latest Wagtail structure
-    panels = [
-        MultiFieldPanel([
-            FieldPanel("user", read_only=True),
-            FieldPanel("phone"),
-            FieldPanel("date_of_birth"),
-            FieldPanel("gender"),
-        ], heading=_("Personal Information")),
-        
-        MultiFieldPanel([
-            FieldPanel("address"),
-            FieldPanel("city"),
-            FieldPanel("province"),
-            FieldPanel("postal_code"),
-        ], heading=_("Address Information")),
-        
-        MultiFieldPanel([
-            FieldPanel("allergies"),
-            FieldPanel("medical_conditions"),
-            FieldPanel("current_medications"),
-        ], heading=_("Medical Information"), classname="collapsible"),
-        
-        MultiFieldPanel([
-            FieldPanel("emergency_contact_name"),
-            FieldPanel("emergency_contact_phone"),
-            FieldPanel("emergency_contact_relationship"),
-        ], heading=_("Emergency Contact"), classname="collapsible"),
-        
-        MultiFieldPanel([
-            FieldPanel("preferred_language"),
-            FieldPanel("timezone"),
-            FieldPanel("email_notifications"),
-            FieldPanel("sms_notifications"),
-            FieldPanel("mfa_enabled"),
-        ], heading=_("Preferences")),
+    # Specify form fields to avoid ImproperlyConfigured error
+    form_fields = [
+        "avatar", "phone", "date_of_birth", "gender", "address", "city", 
+        "province", "postal_code", "allergies", "medical_conditions", "current_medications",
+        "emergency_contact_name", "emergency_contact_phone", "emergency_contact_relationship",
+        "preferred_language", "timezone", "email_notifications", "sms_notifications", "mfa_enabled"
     ]
 
 
@@ -111,17 +83,17 @@ class UserGroupViewSet(ModelViewSet):
     model = UserGroup
     menu_label = _("User Groups")
     icon = "group"
-    list_display = ("name", "description", "is_active", "created_at")
-    list_filter = ("is_active", "created_at")
+    list_display = ("name", "description", "created_at")
+    list_filter = ("created_at",)
     search_fields = ("name", "description")
     ordering = ("name",)
+    form_fields = ["name", "description"]
     
     # Define panels for the latest Wagtail structure
     panels = [
         MultiFieldPanel([
             FieldPanel("name"),
             FieldPanel("description"),
-            FieldPanel("is_active"),
         ], heading=_("Group Information")),
     ]
 
@@ -130,17 +102,17 @@ class UserRoleViewSet(ModelViewSet):
     model = UserRole
     menu_label = _("User Roles")
     icon = "tag"
-    list_display = ("name", "description", "is_active", "created_at")
-    list_filter = ("is_active", "created_at")
+    list_display = ("name", "description", "created_at")
+    list_filter = ("created_at",)
     search_fields = ("name", "description")
     ordering = ("name",)
+    form_fields = ["name", "description", "permissions"]
     
     # Define panels for the latest Wagtail structure
     panels = [
         MultiFieldPanel([
             FieldPanel("name"),
             FieldPanel("description"),
-            FieldPanel("is_active"),
         ], heading=_("Role Information")),
         
         MultiFieldPanel([
@@ -157,6 +129,7 @@ class UserGroupMembershipViewSet(ModelViewSet):
     list_filter = ("is_active", "group", "role", "joined_at")
     search_fields = ("user__username", "group__name", "role__name")
     ordering = ("-joined_at",)
+    form_fields = ["user", "group", "role", "is_active"]
     
     # Define panels for the latest Wagtail structure
     panels = [
@@ -166,10 +139,6 @@ class UserGroupMembershipViewSet(ModelViewSet):
             FieldPanel("role"),
             FieldPanel("is_active"),
         ], heading=_("Membership Details")),
-        
-        MultiFieldPanel([
-            FieldPanel("notes"),
-        ], heading=_("Additional Information"), classname="collapsible"),
     ]
 
 

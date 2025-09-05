@@ -52,6 +52,21 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
+# Content Security Policy settings - Disabled in favor of custom CSPMiddleware
+# SECURE_CONTENT_SECURITY_POLICY = {
+#     'default-src': "'self'",
+#     'img-src': "'self' data: blob: https://s3.naboomneighbornet.net.za https://www.gravatar.com https://*.gravatar.com",
+#     'script-src': "'self' 'unsafe-inline' 'unsafe-eval'",
+#     'style-src': "'self' 'unsafe-inline'",
+#     'font-src': "'self' data:",
+#     'connect-src': "'self'",
+#     'frame-src': "'self'",
+#     'object-src': "'none'",
+#     'base-uri': "'self'",
+#     'form-action': "'self'",
+# }
+
+
 
 # Application definition
 
@@ -104,6 +119,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "home.middleware.CSPMiddleware",  # Re-enabled to fix CSP image loading issues
 ]
 
 ROOT_URLCONF = "naboomcommunity.urls"
@@ -206,7 +222,7 @@ WAGTAILIMAGES_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp']
 WAGTAILDOCS_SERVE_METHOD = 'redirect'  
 
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'naboomneighbornet-media')
-AWS_S3_ENDPOINT_URL = 'https://s3.r'
+AWS_S3_ENDPOINT_URL = 'https://s3.naboomneighbornet.net.za'
 AWS_S3_CUSTOM_DOMAIN = 's3.naboomneighbornet.net.za'
 AWS_DEFAULT_ACL = 'public-read'
 
@@ -259,6 +275,31 @@ WAGTAILIMAGES_FORMAT_CONVERSIONS = {
     'bmp': 'jpeg',
     'webp': 'webp',
 }
+
+# Configure Wagtail to use S3 for images
+WAGTAILIMAGES_BACKEND = 'wagtail.images.backends.pillow.PillowBackend'
+WAGTAILIMAGES_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'svg']
+
+# Configure Wagtail images to use S3 storage
+WAGTAILIMAGES_STORAGE_BACKEND = 'naboomcommunity.custom_storages.MediaStorage'
+
+# Ensure Wagtail uses the correct storage for image serving
+WAGTAILIMAGES_SERVE_METHOD = 'redirect'  # Use redirects to S3 URLs
+
+# Configure image URL generation for admin
+WAGTAILIMAGES_JPEG_QUALITY = 85
+WAGTAILIMAGES_WEBP_QUALITY = 85
+
+# Ensure proper URL generation for S3 images
+WAGTAILIMAGES_URL_GENERATOR = 'wagtail.images.utils.url_generator'
+
+# Configure Wagtail API for proper image serving
+WAGTAILIMAGES_API_FIELDS = [
+    'id', 'title', 'file', 'width', 'height', 'created_at', 'file_size'
+]
+
+# Use custom image model for better S3 URL generation
+WAGTAILIMAGES_IMAGE_MODEL = 'home.CustomImage'
 
 # Document storage for Wagtail documents
 WAGTAILDOCS_SERVE_METHOD = 'redirect'  # Use signed URLs for private documents
