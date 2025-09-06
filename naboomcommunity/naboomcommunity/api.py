@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from wagtail.api.v2.views import PagesAPIViewSet
 from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.images.api.v2.views import ImagesAPIViewSet
@@ -20,5 +20,5 @@ custom_api_patterns = [
     path('user-profiles/', test_user_profiles, name='user-profiles'),
 ]
 
-# Export the router and custom patterns separately
-# The URLs file will handle combining them properly
+# Export the router and custom patterns separately.
+# The URLs file will handle combining them properly.

@@ -12,6 +12,8 @@ from .api import api_router, custom_api_patterns
 from .test_jwt import test_jwt_auth
 from .test_viewset import test_user_profiles
 
+wagtail_api_patterns = api_router.get_urlpatterns() + custom_api_patterns
+
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
     path("admin/", include(wagtailadmin_urls)),
@@ -25,11 +27,11 @@ urlpatterns = [
     # Test user profiles endpoint
     path("test-user-profiles/", test_user_profiles, name="test-user-profiles"),
     
-    # Wagtail API v2 (content) - must come before other API routes
-    path("api/v2/", api_router.urls),
-    
-    # Custom API endpoints
-    *[path("api/v2/" + pattern.pattern._route, pattern.callback, name=pattern.name) for pattern in custom_api_patterns],
+    # Wagtail API v2 (content) and custom endpoints - must come before other API routes
+    path(
+        "api/v2/",
+        include((wagtail_api_patterns, api_router.url_namespace), namespace=api_router.url_namespace),
+    ),
 
     # Our custom app APIs (auth, health, etc.)
     path("api/", include("api.urls")),
