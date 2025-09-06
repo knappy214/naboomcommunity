@@ -20,10 +20,7 @@ urlpatterns = [
     # Wagtail API v2 content and app endpoints
     path(
         "api/v2/",
-        include(
-            (api_router.urls[0] + api_urlpatterns, api_router.urls[1]),
-            namespace=api_router.urls[2],
-        ),
+        include((api_router.get_urlpatterns() + api_urlpatterns, "wagtailapi"), namespace="wagtailapi"),
     ),
     # Our custom app APIs (auth, health, etc.)
     path("api/", include(api_urlpatterns)),

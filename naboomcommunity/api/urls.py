@@ -1,4 +1,4 @@
-from django.urls import include, path, re_path
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
@@ -35,12 +35,16 @@ api_urlpatterns = [
     path("", include(router.urls)),
 
     # JWT auth
-    re_path(r"^auth/jwt/create/?$", EmailTokenObtainPairView.as_view()),
-    path("auth/jwt/refresh/", TokenRefreshView.as_view()),
-    path("auth/jwt/verify/", TokenVerifyView.as_view()),
-    path("auth/register/", RegisterView.as_view()),
-    path("auth/password-reset/", PasswordResetRequestView.as_view()),
-    path("auth/password-reset/confirm/", PasswordResetConfirmView.as_view()),
+    path("auth/jwt/create/", EmailTokenObtainPairView.as_view(), name="jwt-create"),
+    path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
+    path("auth/jwt/verify/", TokenVerifyView.as_view(), name="jwt-verify"),
+    path("auth/register/", RegisterView.as_view(), name="auth-register"),
+    path("auth/password-reset/", PasswordResetRequestView.as_view(), name="auth-password-reset"),
+    path(
+        "auth/password-reset/confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="auth-password-reset-confirm",
+    ),
 
     path("health/", health),
 

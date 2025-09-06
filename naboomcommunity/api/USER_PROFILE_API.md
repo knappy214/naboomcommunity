@@ -10,9 +10,20 @@ All user profile endpoints require JWT authentication. Include the JWT token in 
 Authorization: Bearer <your_jwt_token>
 ```
 
+### Authentication Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/jwt/create/` | Obtain access and refresh tokens using email and password |
+| POST | `/api/auth/jwt/refresh/` | Refresh an existing access token |
+| POST | `/api/auth/jwt/verify/` | Verify token validity |
+| POST | `/api/auth/register/` | Register a new user account |
+| POST | `/api/auth/password-reset/` | Request a password reset link |
+| POST | `/api/auth/password-reset/confirm/` | Confirm password reset with UID and token |
+
 ## Base URL
 
-All endpoints are prefixed with `/api/`
+All endpoints are prefixed with `/api/`. The same endpoints are also available under `/api/v2/` for Wagtail API consumers.
 
 ## Endpoints Overview
 
