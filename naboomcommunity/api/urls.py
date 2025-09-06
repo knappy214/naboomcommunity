@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
@@ -35,7 +35,7 @@ api_urlpatterns = [
     path("", include(router.urls)),
 
     # JWT auth
-    path("auth/jwt/create/", EmailTokenObtainPairView.as_view()),
+    re_path(r"^auth/jwt/create/?$", EmailTokenObtainPairView.as_view()),
     path("auth/jwt/refresh/", TokenRefreshView.as_view()),
     path("auth/jwt/verify/", TokenVerifyView.as_view()),
     path("auth/register/", RegisterView.as_view()),
