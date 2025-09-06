@@ -316,6 +316,11 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_SITE_NAME = "Naboom Community"
 WAGTAILADMIN_BASE_URL = "https://naboomneighbornet.net.za"
 
+# Wagtail API v2 settings
+WAGTAILAPI_BASE_URL = "https://naboomneighbornet.net.za"
+WAGTAILAPI_SEARCH_ENABLED = True
+WAGTAILAPI_LIMIT_MAX = 20
+
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
 WAGTAILSEARCH_BACKENDS = {

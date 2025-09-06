@@ -216,7 +216,7 @@ def main():
     """Example usage of the User Profile API client."""
     
     # Configuration
-    BASE_URL = 'http://localhost:8000/api'  # Adjust to your server URL
+    BASE_URL = 'http://localhost:8001/api'  # Adjust to your server URL
     USERNAME = 'admin'  # Adjust to your username
     PASSWORD = 'admin123'  # Adjust to your password
     

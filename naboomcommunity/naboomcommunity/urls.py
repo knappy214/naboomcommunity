@@ -8,7 +8,9 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.images.views.serve import serve
 from home.views import serve_image
 
-from .api import api_router
+from .api import api_router, custom_api_patterns
+from .test_jwt import test_jwt_auth
+from .test_viewset import test_user_profiles
 
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
@@ -17,8 +19,17 @@ urlpatterns = [
     # Django admin (moved to /django-admin/ to avoid conflicts)
     path("django-admin/", admin.site.urls),
 
-    # Wagtail API v2 (content)
-    path("api/v2/", api_router.urls),
+    # Test JWT endpoint
+    path("test-jwt/", test_jwt_auth, name="test-jwt"),
+    
+    # Test user profiles endpoint
+    path("test-user-profiles/", test_user_profiles, name="test-user-profiles"),
+    
+    # Wagtail API v2 (content) - must come before other API routes
+    path("api/v2/", include(api_router.urls)),
+    
+    # Custom API endpoints
+    *[path("api/v2/" + pattern.pattern._route, pattern.callback, name=pattern.name) for pattern in custom_api_patterns],
 
     # Our custom app APIs (auth, health, etc.)
     path("api/", include("api.urls")),
@@ -36,7 +47,7 @@ urlpatterns = [
     # Custom image serving for S3
     re_path(r'^images/([^/]*)/(\d*)/([^/]*)/[^/]*$', serve_image, name='wagtailimages_serve'),
 
-    # Keep below API routes
+    # Wagtail catch-all - must be last
     re_path(r"^", include(wagtail_urls)),
 ]
 
