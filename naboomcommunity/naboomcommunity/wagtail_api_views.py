@@ -1,13 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from rest_framework_simplejwt.tokens import AccessToken
-from wagtail.api.v2.views import BaseAPIViewSet
 from wagtail.api.v2.serializers import BaseSerializer
-from home.models import UserProfile, UserGroup, UserRole, UserGroupMembership
-
-User = get_user_model()
+from wagtail.api.v2.views import BaseAPIViewSet
+from home.models import UserGroup, UserGroupMembership, UserProfile, UserRole
 
 
 class UserProfileSerializer(BaseSerializer):
@@ -95,88 +91,38 @@ class UserGroupMembershipSerializer(BaseSerializer):
 
 class UserProfileAPIViewSet(BaseAPIViewSet):
     """Wagtail API v2 ViewSet for UserProfile model."""
-    
+
     name = "user-profiles"
     model = UserProfile
     serializer_class = UserProfileSerializer
-    
-    def authenticate_user(self, request):
-        """Authenticate user using JWT token."""
-        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-        if not auth_header.startswith('Bearer '):
-            print("DEBUG: No Bearer token found")
-            return False
-        
-        token = auth_header.split(' ')[1]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def authenticate_user(self, request) -> bool:
+        """Authenticate request using JWT token."""
+        authenticator = JWTAuthentication()
         try:
-            # Manually decode the JWT token
-            access_token = AccessToken(token)
-            user_id = access_token['user_id']
-            user = User.objects.get(id=user_id)
-            request.user = user
-            print(f"DEBUG: Authenticated user {user.username} (ID: {user.id})")
+            user_auth = authenticator.authenticate(request)
+            if user_auth is None:
+                return False
+            request.user, _ = user_auth
             return True
-        except (InvalidToken, TokenError) as e:
-            print(f"DEBUG: JWT token invalid: {e}")
-        except User.DoesNotExist:
-            print(f"DEBUG: User with ID {user_id} not found")
-        except Exception as e:
-            print(f"DEBUG: Unexpected error in JWT authentication: {e}")
-        return False
-    
-    def get_queryset(self):
-        """Get queryset based on authentication and permissions."""
-        if self.request.user.is_authenticated:
-            # Return only the current user's profile
-            return UserProfile.objects.filter(user=self.request.user)
-        return UserProfile.objects.none()
-    
-    def list(self, request, *args, **kwargs):
-        """List user profiles (only current user's profile)."""
-        print(f"DEBUG: Starting list method, user authenticated: {request.user.is_authenticated}")
-        print(f"DEBUG: User: {request.user}")
-        print(f"DEBUG: Authorization header: {request.META.get('HTTP_AUTHORIZATION', 'None')}")
-        
-        # Try to authenticate with JWT token
+        except Exception:
+            return False
+
+    def listing_view(self, request):
         if not self.authenticate_user(request):
-            print("DEBUG: JWT authentication failed, returning empty response")
-            return JsonResponse({
-                'meta': {'total_count': 0},
-                'items': []
-            })
-        
-        print(f"DEBUG: After authentication, user: {request.user.username} (ID: {request.user.id})")
-        
-        # Get or create the current user's profile
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
-        print(f"DEBUG: Profile {'created' if created else 'found'}: {profile.id}")
-        
-        queryset = UserProfile.objects.filter(id=profile.id)
-        print(f"DEBUG: Queryset count: {queryset.count()}")
-        
-        serializer = self.get_serializer(queryset, many=True)
-        print(f"DEBUG: Serialized data: {serializer.data}")
-        
-        return JsonResponse({
-            'meta': {
-                'total_count': queryset.count()
-            },
-            'items': serializer.data
-        })
-    
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        """Retrieve a specific user profile."""
-        # Try to authenticate with JWT token
+            return JsonResponse({'meta': {'total_count': 0}, 'items': []})
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        data = self.serializer_class().to_representation(profile)
+        return JsonResponse({'meta': {'total_count': 1}, 'items': [data]})
+
+    def detail_view(self, request, pk):
         if not self.authenticate_user(request):
-            return JsonResponse(
-                {"detail": "Authentication required"}, 
-                status=401
-            )
-        
-        # Get or create the current user's profile
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
-        serializer = self.get_serializer(profile)
-        return JsonResponse(serializer.data)
+            return JsonResponse({'detail': 'Authentication required'}, status=401)
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        data = self.serializer_class().to_representation(profile)
+        return JsonResponse(data)
 
 
 class UserGroupAPIViewSet(BaseAPIViewSet):
