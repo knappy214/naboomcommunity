@@ -27,10 +27,17 @@ class UserProfileDetailView(generics.RetrieveAPIView):
     """
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsProfileOwner]
-    
+
     def get_object(self):
         """Get the current user's profile."""
-        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        profile, _ = (
+            UserProfile.objects.select_related("user", "avatar")
+            .prefetch_related(
+                "group_memberships__group",
+                "group_memberships__role",
+            )
+            .get_or_create(user=self.request.user)
+        )
         return profile
 
 
@@ -41,10 +48,17 @@ class UserProfileUpdateView(generics.UpdateAPIView):
     """
     serializer_class = UserProfileUpdateSerializer
     permission_classes = [permissions.IsAuthenticated, IsProfileOwner]
-    
+
     def get_object(self):
         """Get the current user's profile."""
-        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        profile, _ = (
+            UserProfile.objects.select_related("user", "avatar")
+            .prefetch_related(
+                "group_memberships__group",
+                "group_memberships__role",
+            )
+            .get_or_create(user=self.request.user)
+        )
         return profile
 
 
@@ -114,10 +128,13 @@ class UserGroupMembershipListView(generics.ListCreateAPIView):
     """
     serializer_class = UserGroupMembershipSerializer
     permission_classes = [permissions.IsAuthenticated, CanManageGroupMemberships]
-    
+
     def get_queryset(self):
         """Get group memberships for the current user."""
-        return UserGroupMembership.objects.filter(user=self.request.user)
+        return (
+            UserGroupMembership.objects.select_related("group", "role")
+            .filter(user=self.request.user)
+        )
     
     def perform_create(self, serializer):
         """Create a new group membership for the current user."""
@@ -134,7 +151,10 @@ class UserGroupMembershipDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         """Get group memberships for the current user only."""
-        return UserGroupMembership.objects.filter(user=self.request.user)
+        return (
+            UserGroupMembership.objects.select_related("group", "role")
+            .filter(user=self.request.user)
+        )
 
 
 @api_view(['GET'])
@@ -145,10 +165,20 @@ def user_profile_stats(request):
     GET /api/user-profile/stats/
     """
     user = request.user
-    profile, created = UserProfile.objects.get_or_create(user=user)
-    
+    profile, _ = (
+        UserProfile.objects.select_related("user", "avatar")
+        .prefetch_related(
+            "group_memberships__group",
+            "group_memberships__role",
+        )
+        .get_or_create(user=user)
+    )
+
     # Get group memberships
-    group_memberships = UserGroupMembership.objects.filter(user=user, is_active=True)
+    group_memberships = (
+        UserGroupMembership.objects.select_related("group", "role")
+        .filter(user=user, is_active=True)
+    )
     
     # Calculate profile completion percentage
     profile_fields = [
