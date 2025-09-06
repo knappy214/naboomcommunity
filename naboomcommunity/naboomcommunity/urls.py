@@ -8,8 +8,6 @@ from wagtail.admin import urls as wagtailadmin_urls
 from home.views import serve_image
 
 from .api import api_router
-from .test_jwt import test_jwt_auth
-from .test_viewset import test_user_profiles
 
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
@@ -18,18 +16,11 @@ urlpatterns = [
     # Django admin (moved to /django-admin/ to avoid conflicts)
     path("django-admin/", admin.site.urls),
 
-    # Test JWT endpoint
-    path("test-jwt/", test_jwt_auth, name="test-jwt"),
-    
-    # Test user profiles endpoint
-    path("test-user-profiles/", test_user_profiles, name="test-user-profiles"),
-    
     # Wagtail API v2 (content) and custom endpoints - must come before other API routes
     path("api/v2/", api_router.urls),
-    path("api/v2/user-profiles/", test_user_profiles, name="user-profiles"),
-
     # Our custom app APIs (auth, health, etc.)
     path("api/", include("api.urls")),
+    path("api/v1/", include("api.urls")),
 
     # OpenAPI for our custom endpoints
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
