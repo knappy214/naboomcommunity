@@ -1,5 +1,8 @@
 # Bytecode cache directories
 __pycache__/
+__pycache__/*
 *.pyc
-
+*.*.pyc
+urls.cpython-312.pyc
+urls.cpython-*.pyc
 venv/
