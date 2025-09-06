@@ -1,3 +1,5 @@
+# Bytecode cache directories
 __pycache__/
 *.pyc
+
 venv/
