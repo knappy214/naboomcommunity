@@ -5,14 +5,11 @@ from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.images.views.serve import serve
 from home.views import serve_image
 
-from .api import api_router, custom_api_patterns
+from .api import api_router
 from .test_jwt import test_jwt_auth
 from .test_viewset import test_user_profiles
-
-wagtail_api_patterns = api_router.get_urlpatterns() + custom_api_patterns
 
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
@@ -28,10 +25,8 @@ urlpatterns = [
     path("test-user-profiles/", test_user_profiles, name="test-user-profiles"),
     
     # Wagtail API v2 (content) and custom endpoints - must come before other API routes
-    path(
-        "api/v2/",
-        include((wagtail_api_patterns, api_router.url_namespace), namespace=api_router.url_namespace),
-    ),
+    path("api/v2/", api_router.urls),
+    path("api/v2/user-profiles/", test_user_profiles, name="user-profiles"),
 
     # Our custom app APIs (auth, health, etc.)
     path("api/", include("api.urls")),
