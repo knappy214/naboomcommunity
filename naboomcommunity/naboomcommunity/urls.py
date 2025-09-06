@@ -26,7 +26,7 @@ urlpatterns = [
     path("test-user-profiles/", test_user_profiles, name="test-user-profiles"),
     
     # Wagtail API v2 (content) - must come before other API routes
-    path("api/v2/", include(api_router.urls)),
+    path("api/v2/", api_router.urls),
     
     # Custom API endpoints
     *[path("api/v2/" + pattern.pattern._route, pattern.callback, name=pattern.name) for pattern in custom_api_patterns],
