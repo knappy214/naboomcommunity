@@ -17,12 +17,13 @@ urlpatterns = [
     # Django admin (moved to /django-admin/ to avoid conflicts)
     path("django-admin/", admin.site.urls),
 
-    # Wagtail API v2 content and app endpoints
+    # Wagtail API v2 content and app endpoints (includes i18n support)
     path(
         "api/v2/",
         include((api_router.get_urlpatterns() + api_urlpatterns, "wagtailapi"), namespace="wagtailapi"),
     ),
-    # Our custom app APIs (auth, health, etc.)
+    
+    # Our custom app APIs (Django REST Framework)
     path("api/", include(api_urlpatterns)),
     path("api/v1/", include(api_urlpatterns)),
 

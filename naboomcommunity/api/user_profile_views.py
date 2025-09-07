@@ -30,14 +30,7 @@ class UserProfileDetailView(generics.RetrieveAPIView):
 
     def get_object(self):
         """Get the current user's profile."""
-        profile, _ = (
-            UserProfile.objects.select_related("user", "avatar")
-            .prefetch_related(
-                "group_memberships__group",
-                "group_memberships__role",
-            )
-            .get_or_create(user=self.request.user)
-        )
+        profile, _ = UserProfile.objects.select_related("user", "avatar").get_or_create(user=self.request.user)
         return profile
 
 
@@ -51,14 +44,7 @@ class UserProfileUpdateView(generics.UpdateAPIView):
 
     def get_object(self):
         """Get the current user's profile."""
-        profile, _ = (
-            UserProfile.objects.select_related("user", "avatar")
-            .prefetch_related(
-                "group_memberships__group",
-                "group_memberships__role",
-            )
-            .get_or_create(user=self.request.user)
-        )
+        profile, _ = UserProfile.objects.select_related("user", "avatar").get_or_create(user=self.request.user)
         return profile
 
 
@@ -165,14 +151,7 @@ def user_profile_stats(request):
     GET /api/user-profile/stats/
     """
     user = request.user
-    profile, _ = (
-        UserProfile.objects.select_related("user", "avatar")
-        .prefetch_related(
-            "group_memberships__group",
-            "group_memberships__role",
-        )
-        .get_or_create(user=user)
-    )
+    profile, _ = UserProfile.objects.select_related("user", "avatar").get_or_create(user=user)
 
     # Get group memberships
     group_memberships = (

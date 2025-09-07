@@ -89,6 +89,43 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} Profile"
+    
+    @property
+    def avatar_url(self):
+        """Get the URL of the user's avatar."""
+        if self.avatar:
+            return self.avatar.file.url
+        return None
+    
+    def get_avatar_small(self):
+        """Get a small version of the avatar (50x50px)."""
+        if self.avatar:
+            try:
+                rendition = self.avatar.get_rendition('fill-50x50')
+                return rendition.url
+            except Exception:
+                return self.avatar.file.url
+        return None
+    
+    def get_avatar_medium(self):
+        """Get a medium version of the avatar (150x150px)."""
+        if self.avatar:
+            try:
+                rendition = self.avatar.get_rendition('fill-150x150')
+                return rendition.url
+            except Exception:
+                return self.avatar.file.url
+        return None
+    
+    def get_avatar_large(self):
+        """Get a large version of the avatar (300x300px)."""
+        if self.avatar:
+            try:
+                rendition = self.avatar.get_rendition('fill-300x300')
+                return rendition.url
+            except Exception:
+                return self.avatar.file.url
+        return None
 
 
 class UserGroup(models.Model):
