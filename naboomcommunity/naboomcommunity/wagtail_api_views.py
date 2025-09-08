@@ -43,49 +43,53 @@ class UserProfileSerializer(BaseSerializer):
 
 class UserGroupSerializer(BaseSerializer):
     """Wagtail API v2 serializer for UserGroup."""
-    
+
     def to_representation(self, instance):
         """Convert UserGroup instance to API representation."""
         return {
-            'id': instance.id,
-            'name': instance.name,
-            'description': instance.description,
-            'is_active': instance.is_active,
-            'created_at': instance.created_at,
-            'updated_at': instance.updated_at,
+            "id": instance.id,
+            "name": instance.name,
+            "description": instance.description,
+            "created_at": instance.created_at,
+            "updated_at": instance.updated_at,
         }
 
 
 class UserRoleSerializer(BaseSerializer):
     """Wagtail API v2 serializer for UserRole."""
-    
+
     def to_representation(self, instance):
         """Convert UserRole instance to API representation."""
         return {
-            'id': instance.id,
-            'name': instance.name,
-            'description': instance.description,
-            'permissions': instance.permissions,
-            'is_active': instance.is_active,
-            'created_at': instance.created_at,
-            'updated_at': instance.updated_at,
+            "id": instance.id,
+            "name": instance.name,
+            "description": instance.description,
+            "permissions": instance.permissions,
+            "created_at": instance.created_at,
+            "updated_at": instance.updated_at,
         }
 
 
 class UserGroupMembershipSerializer(BaseSerializer):
     """Wagtail API v2 serializer for UserGroupMembership."""
-    
+
     def to_representation(self, instance):
         """Convert UserGroupMembership instance to API representation."""
         return {
-            'id': instance.id,
-            'group': UserGroupSerializer(instance.group).to_representation(instance.group),
-            'role': UserRoleSerializer(instance.role).to_representation(instance.role),
-            'joined_at': instance.joined_at,
-            'is_active': instance.is_active,
-            'notes': instance.notes,
-            'created_at': instance.created_at,
-            'updated_at': instance.updated_at,
+            "id": instance.id,
+            "group": {
+                "id": instance.group.id,
+                "name": instance.group.name,
+                "description": instance.group.description,
+            },
+            "role": {
+                "id": instance.role.id,
+                "name": instance.role.name,
+                "description": instance.role.description,
+                "permissions": instance.role.permissions,
+            },
+            "joined_at": instance.joined_at,
+            "is_active": instance.is_active,
         }
 
 
@@ -203,76 +207,96 @@ class UserProfileAPIViewSet(BaseAPIViewSet):
 
 class UserGroupAPIViewSet(BaseAPIViewSet):
     """Wagtail API v2 ViewSet for UserGroup model."""
-    
+
     name = "user-groups"
     model = UserGroup
     serializer_class = UserGroupSerializer
-    
-    def get_queryset(self):
-        """Get active user groups."""
-        return UserGroup.objects.filter(is_active=True)
-    
-    def list(self, request, *args, **kwargs):
-        """List user groups."""
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse({
-            'meta': {
-                'total_count': queryset.count()
-            },
-            'items': serializer.data
-        })
+
+    def listing_view(self, request):
+        queryset = UserGroup.objects.all()
+        items = [
+            self.serializer_class().to_representation(group)
+            for group in queryset
+        ]
+        return JsonResponse({"meta": {"total_count": len(items)}, "items": items})
+
+    def detail_view(self, request, pk):
+        try:
+            group = UserGroup.objects.get(pk=pk)
+        except UserGroup.DoesNotExist:
+            return JsonResponse({"detail": "Not found"}, status=404)
+        data = self.serializer_class().to_representation(group)
+        return JsonResponse(data)
 
 
 class UserRoleAPIViewSet(BaseAPIViewSet):
     """Wagtail API v2 ViewSet for UserRole model."""
-    
+
     name = "user-roles"
     model = UserRole
     serializer_class = UserRoleSerializer
-    
-    def get_queryset(self):
-        """Get active user roles."""
-        return UserRole.objects.filter(is_active=True)
-    
-    def list(self, request, *args, **kwargs):
-        """List user roles."""
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse({
-            'meta': {
-                'total_count': queryset.count()
-            },
-            'items': serializer.data
-        })
+
+    def listing_view(self, request):
+        queryset = UserRole.objects.all()
+        items = [
+            self.serializer_class().to_representation(role)
+            for role in queryset
+        ]
+        return JsonResponse({"meta": {"total_count": len(items)}, "items": items})
+
+    def detail_view(self, request, pk):
+        try:
+            role = UserRole.objects.get(pk=pk)
+        except UserRole.DoesNotExist:
+            return JsonResponse({"detail": "Not found"}, status=404)
+        data = self.serializer_class().to_representation(role)
+        return JsonResponse(data)
 
 
 class UserGroupMembershipAPIViewSet(BaseAPIViewSet):
     """Wagtail API v2 ViewSet for UserGroupMembership model."""
-    
+
     name = "user-group-memberships"
     model = UserGroupMembership
     serializer_class = UserGroupMembershipSerializer
-    
-    def get_queryset(self):
-        """Get group memberships for the current user."""
-        if self.request.user.is_authenticated:
-            return UserGroupMembership.objects.filter(user=self.request.user)
-        return UserGroupMembership.objects.none()
-    
-    def list(self, request, *args, **kwargs):
-        """List user group memberships."""
-        if not request.user.is_authenticated:
-            return JsonResponse({
-                'meta': {'total_count': 0},
-                'items': []
-            })
-        
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse({
-            'meta': {
-                'total_count': queryset.count()
-            },
-            'items': serializer.data
-        })
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def authenticate_user(self, request) -> bool:
+        """Authenticate request using JWT token."""
+        authenticator = JWTAuthentication()
+        try:
+            user_auth = authenticator.authenticate(request)
+            if user_auth is None:
+                return False
+            request.user, _ = user_auth
+            return True
+        except Exception:
+            return False
+
+    def listing_view(self, request):
+        if not self.authenticate_user(request):
+            return JsonResponse({"meta": {"total_count": 0}, "items": []})
+
+        queryset = (
+            UserGroupMembership.objects.select_related("group", "role")
+            .filter(user=request.user)
+        )
+        items = [
+            self.serializer_class().to_representation(membership)
+            for membership in queryset
+        ]
+        return JsonResponse({"meta": {"total_count": len(items)}, "items": items})
+
+    def detail_view(self, request, pk):
+        if not self.authenticate_user(request):
+            return JsonResponse({"detail": "Authentication required"}, status=401)
+        try:
+            membership = (
+                UserGroupMembership.objects.select_related("group", "role")
+                .get(pk=pk, user=request.user)
+            )
+        except UserGroupMembership.DoesNotExist:
+            return JsonResponse({"detail": "Not found"}, status=404)
+        data = self.serializer_class().to_representation(membership)
+        return JsonResponse(data)
