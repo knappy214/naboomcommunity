@@ -119,7 +119,7 @@ class UserProfileAPIViewSet(BaseAPIViewSet):
 
     def listing_view(self, request):
         if not self.authenticate_user(request):
-            return JsonResponse({'meta': {'total_count': 0}, 'items': []})
+            return JsonResponse({'detail': 'Authentication required'}, status=401)
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
         data = self.serializer_class().to_representation(profile)
         

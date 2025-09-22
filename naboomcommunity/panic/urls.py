@@ -23,6 +23,7 @@ urlpatterns = [
     path("api/vehicle/tracks", views_vehicle.tracks, name="panic_vehicle_tracks"),
     path("api/waypoints", views_waypoints.list_waypoints, name="panic_waypoints"),
     path("api/stream", views_stream.sse_stream, name="panic_sse_stream"),
+    path("api/incidents/", views.list_incidents, name="panic_incidents_list"),
     path("api/incidents/<int:pk>/ack", views_actions.ack, name="panic_ack"),
     path("api/incidents/<int:pk>/resolve", views_actions.resolve, name="panic_resolve"),
     path("webhooks/clickatell/inbound/", views.clickatell_inbound, name="panic_clickatell_inbound"),

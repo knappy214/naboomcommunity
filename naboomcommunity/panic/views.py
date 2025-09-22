@@ -205,3 +205,35 @@ def clickatell_status(request: HttpRequest) -> JsonResponse:
     )
 
     return JsonResponse({"ok": True})
+
+
+@require_http_methods(["GET"])
+def list_incidents(request: HttpRequest) -> JsonResponse:
+    """List incidents with optional filtering by status and province."""
+    from .serializers import IncidentSerializer
+    
+    queryset = Incident.objects.select_related("client").prefetch_related("events").order_by("-created_at")
+    
+    # Filter by status if provided
+    status = request.GET.get("status")
+    if status:
+        queryset = queryset.filter(status=status)
+    
+    # Filter by province if provided
+    province = request.GET.get("province")
+    if province:
+        queryset = queryset.filter(province=province)
+    
+    # Limit results
+    try:
+        limit = min(int(request.GET.get("limit", 50)), 200)
+    except (TypeError, ValueError):
+        limit = 50
+    
+    incidents = queryset[:limit]
+    items = [IncidentSerializer(incident).data for incident in incidents]
+    
+    return JsonResponse({
+        "meta": {"total_count": queryset.count()},
+        "items": items
+    })
