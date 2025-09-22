@@ -158,9 +158,9 @@ WSGI_APPLICATION = "naboomcommunity.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.getenv("POSTGRES_DB", "naboom"),
-        "USER": os.getenv("POSTGRES_USER", "naboom"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
+        "NAME": os.getenv("POSTGRES_DB", "naboomneighbornetdb"),
+        "USER": os.getenv("POSTGRES_USER", "naboomneighbornetdb_user"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "hpG8R0bIQpS@&5yO"),
         "HOST": os.getenv("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }

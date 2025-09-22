@@ -5,7 +5,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
-from django.contrib.gis.db.models import indexes as gis_indexes
+from django.contrib.postgres.indexes import GistIndex
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -48,7 +48,7 @@ class ClientProfile(models.Model):
     class Meta:
         ordering = ["full_name"]
         indexes = [
-            gis_indexes.GistIndex(fields=["location"], name="panic_client_location_gix"),
+            GistIndex(fields=["location"], name="panic_client_location_gix"),
             models.Index(fields=["province"], name="panic_client_province_idx"),
         ]
 
@@ -185,7 +185,7 @@ class Incident(models.Model):
     class Meta:
         ordering = ["-created_at"]
         indexes = [
-            gis_indexes.GistIndex(fields=["location"], name="panic_incident_location_gix"),
+            GistIndex(fields=["location"], name="panic_incident_location_gix"),
             models.Index(fields=["status"], name="panic_incident_status_idx"),
             models.Index(fields=["province", "status"], name="panic_incident_province_idx"),
         ]
@@ -386,7 +386,7 @@ class VehiclePosition(models.Model):
         ordering = ["-recorded_at"]
         indexes = [
             models.Index(fields=["vehicle", "-recorded_at"], name="panic_vehicle_track_idx"),
-            gis_indexes.GistIndex(fields=["position"], name="panic_vehicle_position_gix"),
+            GistIndex(fields=["position"], name="panic_vehicle_position_gix"),
         ]
 
 
@@ -402,7 +402,7 @@ class PatrolWaypoint(models.Model):
 
     class Meta:
         ordering = ["name"]
-        indexes = [gis_indexes.GistIndex(fields=["point"], name="panic_waypoint_point_gix")]
+        indexes = [GistIndex(fields=["point"], name="panic_waypoint_point_gix")]
 
     def __str__(self) -> str:  # pragma: no cover - display helper
         return self.name
@@ -411,7 +411,7 @@ class PatrolWaypoint(models.Model):
 class PatrolRoute(models.Model):
     name = models.CharField(max_length=120)
     waypoints = models.ManyToManyField(
-        PatrolWaypoint, through="PatrolRouteWaypoint", related_name="routes"
+        "PatrolWaypoint", through="PatrolRouteWaypoint", related_name="routes"
     )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -424,7 +424,7 @@ class PatrolRoute(models.Model):
 
 
 class PatrolRouteWaypoint(models.Model):
-    route = models.ForeignKey(PatrolRoute, on_delete=models.CASCADE)
+    route = models.ForeignKey("PatrolRoute", on_delete=models.CASCADE)
     waypoint = models.ForeignKey(PatrolWaypoint, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
 
@@ -439,7 +439,7 @@ class PatrolShift(models.Model):
         Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name="shifts"
     )
     route = models.ForeignKey(
-        PatrolRoute, on_delete=models.SET_NULL, null=True, blank=True, related_name="shifts"
+        "PatrolRoute", on_delete=models.SET_NULL, null=True, blank=True, related_name="shifts"
     )
     started_at = models.DateTimeField(default=timezone.now)
     ended_at = models.DateTimeField(null=True, blank=True)
@@ -459,7 +459,7 @@ class PatrolAlert(models.Model):
         INCIDENT = "incident", _("Incident")
 
     shift = models.ForeignKey(
-        PatrolShift, on_delete=models.CASCADE, related_name="alerts"
+        "PatrolShift", on_delete=models.CASCADE, related_name="alerts"
     )
     waypoint = models.ForeignKey(
         PatrolWaypoint, on_delete=models.SET_NULL, null=True, blank=True, related_name="alerts"
