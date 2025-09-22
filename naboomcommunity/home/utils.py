@@ -391,7 +391,6 @@ def export_user_data(user: User, format: str = 'json') -> Dict[str, Any]:
                 'role': membership.role.name,
                 'joined_at': membership.joined_at.isoformat(),
                 'is_active': membership.is_active,
-                'notes': membership.notes,
             }
             for membership in user.group_memberships.filter(is_active=True)
         ],

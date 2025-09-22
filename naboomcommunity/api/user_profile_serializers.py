@@ -11,7 +11,7 @@ class UserGroupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserGroup
-        fields = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'created_at', 'updated_at']
 
 
 class UserRoleSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class UserRoleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserRole
-        fields = ['id', 'name', 'description', 'permissions', 'is_active', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'permissions', 'created_at', 'updated_at']
 
 
 class UserGroupMembershipSerializer(serializers.ModelSerializer):
@@ -33,9 +33,9 @@ class UserGroupMembershipSerializer(serializers.ModelSerializer):
         model = UserGroupMembership
         fields = [
             'id', 'group', 'role', 'group_id', 'role_id', 
-            'joined_at', 'is_active', 'notes', 'created_at', 'updated_at'
+            'joined_at', 'is_active'
         ]
-        read_only_fields = ['id', 'joined_at', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'joined_at']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
