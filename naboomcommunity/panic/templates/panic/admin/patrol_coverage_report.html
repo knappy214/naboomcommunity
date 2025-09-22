@@ -1,0 +1,48 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block titletag %}{% trans "Patrol coverage" %}{% endblock %}
+
+{% block content %}
+    <header class="nice-padding">
+        <div class="row">
+            <div class="left">
+                <h1>{% trans "Patrol coverage" %}</h1>
+                <p class="help">{% blocktrans %}Coverage statistics for patrol shifts during the past {{ days }} days.{% endblocktrans %}</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="nice-padding">
+        {% if results %}
+            <table class="listing">
+                <thead>
+                <tr>
+                    <th>{% trans "Shift" %}</th>
+                    <th>{% trans "Vehicle" %}</th>
+                    <th>{% trans "Route" %}</th>
+                    <th>{% trans "Coverage" %}</th>
+                    <th>{% trans "Waypoints" %}</th>
+                    <th>{% trans "Visited" %}</th>
+                    <th>{% trans "Gaps" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result.shift.name }}</td>
+                        <td>{{ result.vehicle }}</td>
+                        <td>{{ result.route }}</td>
+                        <td>{{ result.coverage }}%</td>
+                        <td>{{ result.waypoint_total }}</td>
+                        <td>{{ result.visited }}</td>
+                        <td>{{ result.gaps }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>{% trans "No patrol shifts recorded during the selected period." %}</p>
+        {% endif %}
+    </div>
+{% endblock %}

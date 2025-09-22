@@ -1,0 +1,734 @@
+# Generated manually for panic app initial schema
+from __future__ import annotations
+
+import django.contrib.gis.db.models.fields
+import django.contrib.gis.db.models.indexes
+import django.core.validators
+from django.db import migrations, models
+import django.db.models.deletion
+import django.utils.timezone
+import uuid
+from django.conf import settings
+
+
+class Migration(migrations.Migration):
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="ClientProfile",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("external_id", models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
+                ("full_name", models.CharField(max_length=255)),
+                ("phone_number", models.CharField(max_length=32)),
+                ("email", models.EmailField(blank=True, max_length=254)),
+                ("address", models.CharField(blank=True, max_length=255)),
+                (
+                    "province",
+                    models.CharField(
+                        choices=[
+                            ("limpopo", "Limpopo"),
+                            ("gauteng", "Gauteng"),
+                            ("mpumalanga", "Mpumalanga"),
+                            ("north_west", "North West"),
+                            ("free_state", "Free State"),
+                            ("northern_cape", "Northern Cape"),
+                            ("kwazulu_natal", "KwaZulu-Natal"),
+                            ("eastern_cape", "Eastern Cape"),
+                            ("western_cape", "Western Cape"),
+                        ],
+                        default="limpopo",
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "location",
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="panic_client_profiles",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["full_name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="EscalationRule",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "province",
+                    models.CharField(
+                        choices=[
+                            ("limpopo", "Limpopo"),
+                            ("gauteng", "Gauteng"),
+                            ("mpumalanga", "Mpumalanga"),
+                            ("north_west", "North West"),
+                            ("free_state", "Free State"),
+                            ("northern_cape", "Northern Cape"),
+                            ("kwazulu_natal", "KwaZulu-Natal"),
+                            ("eastern_cape", "Eastern Cape"),
+                            ("western_cape", "Western Cape"),
+                        ],
+                        default="limpopo",
+                        max_length=32,
+                    ),
+                ),
+                ("delay_seconds", models.PositiveIntegerField(default=120)),
+                ("active", models.BooleanField(default=True)),
+                (
+                    "only_for_priority",
+                    models.PositiveSmallIntegerField(
+                        blank=True,
+                        choices=[(1, "Low"), (2, "Medium"), (3, "High"), (4, "Critical")],
+                        help_text="Limit to incidents with the specified minimum priority.",
+                        null=True,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+            ],
+            options={
+                "ordering": ["province", "delay_seconds"],
+            },
+        ),
+        migrations.CreateModel(
+            name="Incident",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("reference", models.CharField(blank=True, default="", max_length=32, unique=True)),
+                ("description", models.TextField(blank=True)),
+                ("source", models.CharField(blank=True, max_length=64)),
+                (
+                    "priority",
+                    models.PositiveSmallIntegerField(
+                        choices=[(1, "Low"), (2, "Medium"), (3, "High"), (4, "Critical")],
+                        default=2,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("open", "Open"),
+                            ("acknowledged", "Acknowledged"),
+                            ("resolved", "Resolved"),
+                            ("cancelled", "Cancelled"),
+                        ],
+                        default="open",
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "location",
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
+                ),
+                ("address", models.CharField(blank=True, max_length=255)),
+                (
+                    "province",
+                    models.CharField(
+                        choices=[
+                            ("limpopo", "Limpopo"),
+                            ("gauteng", "Gauteng"),
+                            ("mpumalanga", "Mpumalanga"),
+                            ("north_west", "North West"),
+                            ("free_state", "Free State"),
+                            ("northern_cape", "Northern Cape"),
+                            ("kwazulu_natal", "KwaZulu-Natal"),
+                            ("eastern_cape", "Eastern Cape"),
+                            ("western_cape", "Western Cape"),
+                        ],
+                        default="limpopo",
+                        max_length=32,
+                    ),
+                ),
+                ("context", models.JSONField(blank=True, default=dict)),
+                ("acknowledged_at", models.DateTimeField(blank=True, null=True)),
+                ("resolved_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "client",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="incidents",
+                        to="panic.clientprofile",
+                    ),
+                ),
+                (
+                    "reported_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="reported_incidents",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="Responder",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("full_name", models.CharField(max_length=255)),
+                ("phone_number", models.CharField(blank=True, max_length=32)),
+                ("email", models.EmailField(blank=True, max_length=254)),
+                (
+                    "responder_type",
+                    models.CharField(
+                        choices=[
+                            ("individual", "Individual"),
+                            ("company", "Company"),
+                            ("service", "Service Provider"),
+                        ],
+                        default="individual",
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "province",
+                    models.CharField(
+                        choices=[
+                            ("limpopo", "Limpopo"),
+                            ("gauteng", "Gauteng"),
+                            ("mpumalanga", "Mpumalanga"),
+                            ("north_west", "North West"),
+                            ("free_state", "Free State"),
+                            ("northern_cape", "Northern Cape"),
+                            ("kwazulu_natal", "KwaZulu-Natal"),
+                            ("eastern_cape", "Eastern Cape"),
+                            ("western_cape", "Western Cape"),
+                        ],
+                        default="limpopo",
+                        max_length=32,
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("notes", models.TextField(blank=True)),
+            ],
+            options={
+                "ordering": ["full_name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="Vehicle",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("name", models.CharField(max_length=120)),
+                ("token", models.CharField(max_length=64, unique=True)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "last_position",
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
+                ),
+                ("last_seen_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "speed_kph",
+                    models.DecimalField(blank=True, decimal_places=1, max_digits=5, null=True, validators=[django.core.validators.MinValueValidator(0)]),
+                ),
+                (
+                    "heading_deg",
+                    models.SmallIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(359),
+                        ],
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="EmergencyContact",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("full_name", models.CharField(max_length=255)),
+                ("phone_number", models.CharField(max_length=32)),
+                ("relationship", models.CharField(blank=True, max_length=120)),
+                ("priority", models.PositiveIntegerField(default=1)),
+                ("is_active", models.BooleanField(default=True)),
+                ("last_confirmed_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="contacts",
+                        to="panic.clientprofile",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["priority", "full_name"],
+                "unique_together": {("client", "phone_number")},
+            },
+        ),
+        migrations.CreateModel(
+            name="PushDevice",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("token", models.CharField(max_length=255, unique=True)),
+                (
+                    "platform",
+                    models.CharField(
+                        choices=[
+                            ("android", "Android"),
+                            ("ios", "iOS"),
+                            ("web", "Web"),
+                            ("unknown", "Unknown"),
+                        ],
+                        default="unknown",
+                        max_length=16,
+                    ),
+                ),
+                ("app_version", models.CharField(blank=True, max_length=32)),
+                ("last_seen_at", models.DateTimeField(auto_now=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "client",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="push_devices",
+                        to="panic.clientprofile",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="panic_push_devices",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-last_seen_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatrolWaypoint",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("name", models.CharField(max_length=120)),
+                (
+                    "point",
+                    django.contrib.gis.db.models.fields.PointField(geography=True, srid=4326),
+                ),
+                ("radius_m", models.PositiveIntegerField(default=100)),
+                (
+                    "province",
+                    models.CharField(
+                        choices=[
+                            ("limpopo", "Limpopo"),
+                            ("gauteng", "Gauteng"),
+                            ("mpumalanga", "Mpumalanga"),
+                            ("north_west", "North West"),
+                            ("free_state", "Free State"),
+                            ("northern_cape", "Northern Cape"),
+                            ("kwazulu_natal", "KwaZulu-Natal"),
+                            ("eastern_cape", "Eastern Cape"),
+                            ("western_cape", "Western Cape"),
+                        ],
+                        default="limpopo",
+                        max_length=32,
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                "ordering": ["name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatrolRoute",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("name", models.CharField(max_length=120)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "waypoints",
+                    models.ManyToManyField(related_name="routes", through="panic.PatrolRouteWaypoint", to="panic.patrolwaypoint"),
+                ),
+            ],
+            options={
+                "ordering": ["name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatrolShift",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("name", models.CharField(max_length=120)),
+                ("started_at", models.DateTimeField(default=django.utils.timezone.now)),
+                ("ended_at", models.DateTimeField(blank=True, null=True)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "route",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="shifts",
+                        to="panic.patrolroute",
+                    ),
+                ),
+                (
+                    "vehicle",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="shifts",
+                        to="panic.vehicle",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-started_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatrolAlert",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                (
+                    "kind",
+                    models.CharField(
+                        choices=[
+                            ("missed", "Missed Waypoint"),
+                            ("check_in", "Check-in"),
+                            ("incident", "Incident"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                ("details", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("acknowledged_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "shift",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="alerts",
+                        to="panic.patrolshift",
+                    ),
+                ),
+                (
+                    "waypoint",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="alerts",
+                        to="panic.patrolwaypoint",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="VehiclePosition",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                (
+                    "position",
+                    django.contrib.gis.db.models.fields.PointField(geography=True, srid=4326),
+                ),
+                ("recorded_at", models.DateTimeField(db_index=True, default=django.utils.timezone.now)),
+                ("speed_kph", models.DecimalField(blank=True, decimal_places=1, max_digits=5, null=True)),
+                ("heading_deg", models.SmallIntegerField(blank=True, null=True)),
+                (
+                    "vehicle",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="positions", to="panic.vehicle"),
+                ),
+            ],
+            options={
+                "ordering": ["-recorded_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PatrolRouteWaypoint",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("order", models.PositiveIntegerField(default=0)),
+                (
+                    "route",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="panic.patrolroute"),
+                ),
+                (
+                    "waypoint",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="panic.patrolwaypoint"),
+                ),
+            ],
+            options={
+                "ordering": ["order"],
+                "unique_together": {("route", "waypoint")},
+            },
+        ),
+        migrations.CreateModel(
+            name="IncidentEvent",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                (
+                    "kind",
+                    models.CharField(
+                        choices=[
+                            ("created", "Created"),
+                            ("updated", "Updated"),
+                            ("escalated", "Escalated"),
+                            ("acknowledged", "Acknowledged"),
+                            ("resolved", "Resolved"),
+                            ("message_inbound", "Inbound Message"),
+                            ("message_outbound", "Outbound Message"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                ("description", models.TextField(blank=True)),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="panic_events",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "incident",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="events", to="panic.incident"),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="InboundMessage",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("message_id", models.CharField(blank=True, max_length=128)),
+                ("from_number", models.CharField(max_length=32)),
+                ("to_number", models.CharField(max_length=32)),
+                ("body", models.TextField()),
+                ("received_at", models.DateTimeField(default=django.utils.timezone.now)),
+                ("provider", models.CharField(default="clickatell", max_length=32)),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                (
+                    "incident",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="inbound_messages",
+                        to="panic.incident",
+                    ),
+                ),
+            ],
+            options={"ordering": ["-received_at"]},
+        ),
+        migrations.CreateModel(
+            name="OutboundMessage",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("message_id", models.CharField(blank=True, max_length=128)),
+                ("to_number", models.CharField(max_length=32)),
+                ("body", models.TextField()),
+                ("status", models.CharField(default="queued", max_length=32)),
+                ("sent_at", models.DateTimeField(default=django.utils.timezone.now)),
+                ("provider", models.CharField(default="clickatell", max_length=32)),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                (
+                    "incident",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="outbound_messages",
+                        to="panic.incident",
+                    ),
+                ),
+            ],
+            options={"ordering": ["-sent_at"]},
+        ),
+        migrations.CreateModel(
+            name="EscalationTarget",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                (
+                    "target_type",
+                    models.CharField(
+                        choices=[
+                            ("responder", "Responder"),
+                            ("contact", "Emergency Contact"),
+                            ("phone", "Phone Number"),
+                            ("webhook", "Webhook"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                (
+                    "channel",
+                    models.CharField(
+                        choices=[("sms", "SMS"), ("push", "Push Notification"), ("email", "Email"), ("call", "Phone Call")],
+                        default="sms",
+                        max_length=16,
+                    ),
+                ),
+                ("destination", models.CharField(blank=True, max_length=255)),
+                ("active", models.BooleanField(default=True)),
+                ("order", models.PositiveIntegerField(default=0)),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="escalation_targets",
+                        to="panic.emergencycontact",
+                    ),
+                ),
+                (
+                    "responder",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="escalation_targets",
+                        to="panic.responder",
+                    ),
+                ),
+                (
+                    "rule",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="targets", to="panic.escalationrule"),
+                ),
+            ],
+            options={
+                "ordering": ["order", "id"],
+            },
+        ),
+        migrations.AddIndex(
+            model_name="clientprofile",
+            index=django.contrib.gis.db.models.indexes.GistIndex(fields=["location"], name="panic_client_location_gix"),
+        ),
+        migrations.AddIndex(
+            model_name="clientprofile",
+            index=models.Index(fields=["province"], name="panic_client_province_idx"),
+        ),
+        migrations.AddIndex(
+            model_name="responder",
+            index=models.Index(fields=["province"], name="panic_responder_province_idx"),
+        ),
+        migrations.AddIndex(
+            model_name="incident",
+            index=django.contrib.gis.db.models.indexes.GistIndex(fields=["location"], name="panic_incident_location_gix"),
+        ),
+        migrations.AddIndex(
+            model_name="incident",
+            index=models.Index(fields=["status"], name="panic_incident_status_idx"),
+        ),
+        migrations.AddIndex(
+            model_name="incident",
+            index=models.Index(fields=["province", "status"], name="panic_incident_province_idx"),
+        ),
+        migrations.AddIndex(
+            model_name="vehicleposition",
+            index=models.Index(fields=["vehicle", "-recorded_at"], name="panic_vehicle_track_idx"),
+        ),
+        migrations.AddIndex(
+            model_name="vehicleposition",
+            index=django.contrib.gis.db.models.indexes.GistIndex(fields=["position"], name="panic_vehicle_position_gix"),
+        ),
+        migrations.AddIndex(
+            model_name="patrolwaypoint",
+            index=django.contrib.gis.db.models.indexes.GistIndex(fields=["point"], name="panic_waypoint_point_gix"),
+        ),
+    ]

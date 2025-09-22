@@ -9,6 +9,7 @@ from home.views import serve_image
 
 from .api import api_router
 from api.urls import api_urlpatterns
+from panic.api import api_router as panic_api_router
 
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
@@ -20,12 +21,21 @@ urlpatterns = [
     # Wagtail API v2 content and app endpoints (includes i18n support)
     path(
         "api/v2/",
-        include((api_router.get_urlpatterns() + api_urlpatterns, "wagtailapi"), namespace="wagtailapi"),
+        include(
+            (
+                api_router.get_urlpatterns()
+                + panic_api_router.get_urlpatterns()
+                + api_urlpatterns,
+                "wagtailapi",
+            ),
+            namespace="wagtailapi",
+        ),
     ),
     
     # Our custom app APIs (Django REST Framework)
     path("api/", include(api_urlpatterns)),
     path("api/v1/", include(api_urlpatterns)),
+    path("panic/", include("panic.urls")),
 
     # OpenAPI for our custom endpoints
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

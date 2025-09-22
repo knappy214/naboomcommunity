@@ -1,0 +1,30 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block titletag %}{% trans "Panic dashboard" %}{% endblock %}
+
+{% block content %}
+    <header class="nice-padding">
+        <div class="row">
+            <div class="left">
+                <h1>{% trans "Panic dashboard" %}</h1>
+                <p class="help">{% trans "Quick links to manage panic response models." %}</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="nice-padding">
+        <ul class="listing">
+            {% for section in sections %}
+                <li>
+                    <a href="{{ section.url }}">
+                        <strong>{{ section.label }}</strong>
+                        <span class="meta">{{ section.count }}</span>
+                    </a>
+                </li>
+            {% empty %}
+                <li>{% trans "No data available." %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
