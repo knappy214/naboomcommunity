@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import importlib
 import os
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,6 +72,7 @@ X_FRAME_OPTIONS = 'DENY'
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.gis",
     "home",
     "search",
     "api",
@@ -100,7 +102,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "panic",
 ]
+
+if importlib.util.find_spec("psycopg2") or importlib.util.find_spec("psycopg"):
+    INSTALLED_APPS.insert(1, "django.contrib.postgres")
 
 # Enable Wagtail API v2 and OpenAPI schema generation
 INSTALLED_APPS += [
@@ -114,6 +120,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "panic.middleware.VehiclePingRateLimitMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -149,15 +156,24 @@ WSGI_APPLICATION = "naboomcommunity.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'naboomneighbornetdb',
-        'USER': 'naboomneighbornetdb_user',
-        'PASSWORD': 'hpG8R0bIQpS@&5yO',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": os.getenv("POSTGRES_DB", "naboom"),
+        "USER": os.getenv("POSTGRES_USER", "naboom"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
+        "HOST": os.getenv("POSTGRES_HOST", "127.0.0.1"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
+
+if not (importlib.util.find_spec("psycopg2") or importlib.util.find_spec("psycopg")):
+    DATABASES["default"].update(
+        {
+            "ENGINE": "django.contrib.gis.db.backends.spatialite",
+            "NAME": os.getenv("SQLITE_NAME", os.path.join(BASE_DIR, "naboom.sqlite3")),
+        }
+    )
+    SPATIALITE_LIBRARY_PATH = os.getenv("SPATIALITE_LIBRARY_PATH", "mod_spatialite")
 
 
 # Password validation
@@ -340,6 +356,9 @@ WAGTAILSEARCH_BACKENDS = {
 WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
 
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -351,10 +370,19 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
     "http://localhost:8081",
-    "http://localhost:5173",  # Vue development server
 ]
+
+CLICKATELL_API_KEY = os.getenv("CLICKATELL_API_KEY", "")
+CLICKATELL_BASE = os.getenv("CLICKATELL_BASE", "https://platform.clickatell.com")
+PANIC_WEBHOOK_SECRET = os.getenv("PANIC_WEBHOOK_SECRET", "")
+PANIC_VEHICLE_PING_RATE_LIMIT_PER_MINUTE = int(
+    os.getenv("PANIC_VEHICLE_PING_RATE_LIMIT_PER_MINUTE", "120")
+)
+PANIC_TRACK_HISTORY_MINUTES = int(os.getenv("PANIC_TRACK_HISTORY_MINUTES", "60"))
+PANIC_SSE_POLL_INTERVAL = float(os.getenv("PANIC_SSE_POLL_INTERVAL", "5"))
+ENABLE_SSE = os.getenv("ENABLE_SSE", "0") in {"1", "true", "True"}
 
 # Email and frontend configuration
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
