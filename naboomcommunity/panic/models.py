@@ -475,3 +475,7 @@ class PatrolAlert(models.Model):
     def acknowledge(self) -> None:
         self.acknowledged_at = timezone.now()
         self.save(update_fields=["acknowledged_at"])
+
+
+# Import Wagtail admin configuration to register snippets
+from . import wagtail_admin  # noqa: E402

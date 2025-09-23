@@ -18,6 +18,9 @@ These endpoints back the operations dashboard. They assume an authenticated staf
 ### Acknowledge or resolve an incident
 `POST /panic/api/incidents/<id>/ack` and `POST /panic/api/incidents/<id>/resolve` transition an incident to the acknowledged or resolved state, updating timestamps and emitting an `IncidentEvent` that documents the change.【F:naboomcommunity/panic/urls.py†L26-L28】【F:naboomcommunity/panic/views_actions.py†L12-L48】 Repeat submissions are idempotent because the handlers ignore status changes that have already occurred.【F:naboomcommunity/panic/views_actions.py†L35-L47】
 
+### List patrol alerts
+`GET /panic/api/alerts/?shift=&limit=` returns recent patrol alerts with embedded waypoint details. The optional `shift` parameter filters by shift ID, and `limit` (default `50`, capped at `200`) constrains payload size.【F:naboomcommunity/panic/urls.py†L29】【F:naboomcommunity/panic/views.py†L242-L266】 Responses use the `PatrolAlertSerializer`, including alert kind, details, timestamps, shift ID, and full waypoint information.【F:naboomcommunity/panic/serializers.py†L91-L104】
+
 ### Real-time monitoring stream
 `GET /panic/api/stream?last_incident_id=&last_alert_id=` opens a server-sent events (SSE) feed (when `ENABLE_SSE` is enabled) that continuously pushes `incident` and `patrol_alert` events. Each event carries the same serialized payloads used in the REST list endpoints, and a heartbeat `: keepalive` comment keeps idle connections open. Clients should persist the highest received IDs and pass them back via the query parameters to avoid duplicates.【F:naboomcommunity/panic/urls.py†L24-L26】【F:naboomcommunity/panic/views_stream.py†L18-L65】
 
@@ -39,6 +42,15 @@ Vue clients can also query the shared Wagtail API at `/api/v2/panic/…` for ric
 - `GET /api/v2/panic/responders/?province=` yields all active responders sorted by name, optionally filtered by province.【F:naboomcommunity/panic/api.py†L46-L63】
 - `GET /api/v2/panic/alerts/?shift=&limit=` lists patrol alerts with embedded waypoint details, and `GET /api/v2/panic/alerts/<id>/` fetches a single alert.【F:naboomcommunity/panic/api.py†L71-L98】
 
+**⚠️ Important URL Construction Note for Vue Frontend:**
+- Django view endpoints: Use `/panic/api/...` (e.g., `/panic/api/incidents/`, `/panic/api/alerts/`)
+- Wagtail API endpoints: Use `/api/v2/panic/...` (e.g., `/api/v2/panic/incidents/`, `/api/v2/panic/alerts/`) 
+- **Do NOT** combine these paths - `/panic/api/api/v2/panic/alerts/` is incorrect and will result in 404 errors
+
+**Endpoint Selection Guide:**
+- Use Django view endpoints (`/panic/api/...`) for operational dashboard features requiring real-time updates, SSE streams, and write operations (acknowledge, resolve incidents)
+- Use Wagtail API endpoints (`/api/v2/panic/...`) for read-only data consumption, standard REST pagination, and when integrating with other Wagtail content
+
 ## Expo mobile client APIs
 Expo-based mobile apps call the same `/panic/api/` namespace to log incidents, manage contacts, and register for notifications.
 
@@ -55,7 +67,7 @@ Expo-based mobile apps call the same `/panic/api/` namespace to log incidents, m
 Mobile clients can poll the same `/api/v2/panic/incidents/` endpoint used by Vue to retrieve their own incident state, or subscribe to the SSE feed if the app supports background connections. Because incidents embed `events`, clients can detect acknowledgements, resolutions, and escalations without extra endpoints.【F:naboomcommunity/panic/api.py†L11-L38】【F:naboomcommunity/panic/serializers.py†L45-L68】【F:naboomcommunity/panic/views_stream.py†L34-L61】
 
 ## Monitoring incidents end-to-end
-- **Vue console operators** typically maintain a live connection to `/panic/api/stream`, fall back to the paginated list API for historical browsing, and drive the acknowledgement/resolution endpoints to progress incidents through their lifecycle.【F:naboomcommunity/panic/views_stream.py†L18-L65】【F:naboomcommunity/panic/views.py†L210-L239】【F:naboomcommunity/panic/views_actions.py†L12-L48】
+- **Vue console operators** typically maintain a live connection to `/panic/api/stream`, fall back to the paginated list APIs (`/panic/api/incidents/` and `/panic/api/alerts/`) for historical browsing, and drive the acknowledgement/resolution endpoints to progress incidents through their lifecycle.【F:naboomcommunity/panic/views_stream.py†L18-L65】【F:naboomcommunity/panic/views.py†L210-L266】【F:naboomcommunity/panic/views_actions.py†L12-L48】
 - **Expo users** submit new incidents and can monitor responses by polling the incident list for their reference, watching for new events such as escalations created by the escalation service, or receiving push notifications triggered via stored device tokens.【F:naboomcommunity/panic/views.py†L32-L87】【F:naboomcommunity/panic/services.py†L1-L71】【F:naboomcommunity/panic/views_push.py†L21-L49】
 - **Automated channels** like Clickatell SMS webhooks and the USSD handler also create incidents or append messages, ensuring the incident stream remains the single source of truth regardless of entry point.【F:naboomcommunity/panic/urls.py†L16-L32】【F:naboomcommunity/panic/views.py†L153-L207】【F:naboomcommunity/panic/views_ussd.py†L9-L27】
 
@@ -66,4 +78,20 @@ Mobile clients can poll the same `/api/v2/panic/incidents/` endpoint used by Vue
 
 ## Escalations and messaging
 The background escalation service walks open incidents after configurable delays, generates outbound messages, and records escalation events, guaranteeing that both Vue and Expo clients see these follow-ups in the shared event timeline.【F:naboomcommunity/panic/services.py†L1-L71】【F:naboomcommunity/panic/models.py†L202-L233】 Additionally, Clickatell delivery status callbacks update outbound message records so operators can confirm whether SMS alerts were accepted or failed.【F:naboomcommunity/panic/views.py†L188-L207】
+
+## Testing and troubleshooting
+To verify correct API usage:
+
+### Vue frontend testing
+- Verify `/panic/api/incidents/?limit=10` returns incident data
+- Verify `/panic/api/alerts/?limit=10` returns patrol alert data  
+- Verify `/api/v2/panic/incidents/?limit=10` returns Wagtail API formatted data
+- **Avoid URLs like** `/panic/api/api/v2/panic/alerts/` - these will return 404 errors
+- Test SSE connection to `/panic/api/stream` for real-time updates
+
+### Expo client testing  
+- Test incident submission to `/panic/api/submit/` with required fields
+- Verify push token registration at `/panic/api/push/register`
+- Test emergency contacts sync via `/panic/api/contacts/bulk_upsert`
+- Poll `/api/v2/panic/incidents/` for incident updates
 

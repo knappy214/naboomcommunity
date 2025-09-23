@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/incidents/", views.list_incidents, name="panic_incidents_list"),
     path("api/incidents/<int:pk>/ack", views_actions.ack, name="panic_ack"),
     path("api/incidents/<int:pk>/resolve", views_actions.resolve, name="panic_resolve"),
+    path("api/alerts/", views.list_patrol_alerts, name="panic_alerts_list"),
     path("webhooks/clickatell/inbound/", views.clickatell_inbound, name="panic_clickatell_inbound"),
     path("webhooks/clickatell/status/", views.clickatell_status, name="panic_clickatell_status"),
     path("ussd/handle", views_ussd.ussd_handle, name="panic_ussd_handle"),

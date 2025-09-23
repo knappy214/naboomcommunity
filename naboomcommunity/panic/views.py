@@ -16,6 +16,7 @@ from .models import (
     IncidentEvent,
     InboundMessage,
     OutboundMessage,
+    PatrolAlert,
 )
 from .security import verify_clickatell_signature
 
@@ -232,6 +233,33 @@ def list_incidents(request: HttpRequest) -> JsonResponse:
     
     incidents = queryset[:limit]
     items = [IncidentSerializer(incident).data for incident in incidents]
+    
+    return JsonResponse({
+        "meta": {"total_count": queryset.count()},
+        "items": items
+    })
+
+
+@require_http_methods(["GET"])
+def list_patrol_alerts(request: HttpRequest) -> JsonResponse:
+    """List patrol alerts with optional filtering by shift and limit."""
+    from .serializers import PatrolAlertSerializer
+    
+    queryset = PatrolAlert.objects.select_related("waypoint").order_by("-created_at")
+    
+    # Filter by shift if provided
+    shift_id = request.GET.get("shift")
+    if shift_id:
+        queryset = queryset.filter(shift_id=shift_id)
+    
+    # Limit results
+    try:
+        limit = min(int(request.GET.get("limit", 50)), 200)
+    except (TypeError, ValueError):
+        limit = 50
+    
+    alerts = queryset[:limit]
+    items = [PatrolAlertSerializer(alert).data for alert in alerts]
     
     return JsonResponse({
         "meta": {"total_count": queryset.count()},
