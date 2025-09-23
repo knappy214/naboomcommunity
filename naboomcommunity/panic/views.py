@@ -60,13 +60,26 @@ def submit_incident(request: HttpRequest) -> JsonResponse:
         else Incident._meta.get_field("province").get_default()
     )
 
+    # Handle priority conversion from string to integer
+    priority_value = payload.get("priority", Incident.Priority.MEDIUM)
+    if isinstance(priority_value, str):
+        priority_mapping = {
+            "low": Incident.Priority.LOW,
+            "medium": Incident.Priority.MEDIUM,
+            "high": Incident.Priority.HIGH,
+            "critical": Incident.Priority.CRITICAL,
+        }
+        priority = priority_mapping.get(priority_value.lower(), Incident.Priority.MEDIUM)
+    else:
+        priority = int(priority_value) if priority_value is not None else Incident.Priority.MEDIUM
+
     with transaction.atomic():
         incident = Incident.objects.create(
             client=client,
             description=str(payload.get("description", "")),
             source=str(payload.get("source", "app")),
             address=str(payload.get("address", "")),
-            priority=int(payload.get("priority", Incident.Priority.MEDIUM)),
+            priority=priority,
             province=str(payload.get("province", default_province)),
             location=point,
             context=payload.get("context", {}),
