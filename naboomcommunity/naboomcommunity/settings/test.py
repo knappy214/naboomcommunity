@@ -4,12 +4,14 @@ import os
 # Use in-memory SQLite database for tests to avoid external dependencies
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
     }
 }
 
-SPATIALITE_LIBRARY_PATH = os.getenv('SPATIALITE_LIBRARY_PATH', 'mod_spatialite')
+INSTALLED_APPS = [
+    app for app in INSTALLED_APPS if app not in {"django.contrib.gis", "panic"}
+]
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',

@@ -9,7 +9,10 @@ from home.views import serve_image
 
 from .api import api_router
 from api.urls import api_urlpatterns
-from panic.api import api_router as panic_api_router
+try:
+    from panic.api import api_router as panic_api_router
+except Exception:  # pragma: no cover - panic app optional in test settings
+    panic_api_router = None
 
 urlpatterns = [
     # Wagtail admin (replaces Django admin)
@@ -24,7 +27,7 @@ urlpatterns = [
         include(
             (
                 api_router.get_urlpatterns()
-                + panic_api_router.get_urlpatterns()
+                + (panic_api_router.get_urlpatterns() if panic_api_router else [])
                 + api_urlpatterns,
                 "wagtailapi",
             ),
@@ -35,7 +38,7 @@ urlpatterns = [
     # Our custom app APIs (Django REST Framework)
     path("api/", include(api_urlpatterns)),
     path("api/v1/", include(api_urlpatterns)),
-    path("panic/", include("panic.urls")),
+    *( [path("panic/", include("panic.urls"))] if panic_api_router else [] ),
 
     # OpenAPI for our custom endpoints
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

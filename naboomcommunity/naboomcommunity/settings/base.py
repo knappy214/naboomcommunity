@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "home",
     "search",
     "api",
+    "communityhub",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.locales",
@@ -102,6 +103,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "channels",
     "corsheaders",
     "panic",
 ]
@@ -151,6 +154,26 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "naboomcommunity.wsgi.application"
+ASGI_APPLICATION = "naboomcommunity.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                (
+                    os.getenv("REDIS_HOST", "127.0.0.1"),
+                    int(os.getenv("REDIS_PORT", "6379")),
+                )
+            ],
+        },
+    }
+}
+
+if not importlib.util.find_spec("channels_redis"):
+    CHANNEL_LAYERS["default"] = {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
 
 
 # Database
@@ -214,7 +237,8 @@ LANGUAGES = [
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
 # Add this line for Django to find translation files
 LOCALE_PATHS = [
-    os.path.join(PROJECT_DIR, 'home', 'locale'),
+    os.path.join(PROJECT_DIR, "home", "locale"),
+    os.path.join(PROJECT_DIR, "communityhub", "locale"),
 ]
 
 USE_TZ = True
@@ -368,6 +392,13 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "community_post_burst": "20/min",
+        "community_alert": "1/30min",
+    },
 }
 
 # JWT Configuration
@@ -439,3 +470,25 @@ ENABLE_SSE = os.getenv("ENABLE_SSE", "1") in {"1", "true", "True"}
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@example.com")
 FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
+
+# Celery configuration for asynchronous fan-out
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER", "0") in {"1", "true", "True"}
+CELERY_TASK_ROUTES = {
+    "communityhub.tasks.fan_out_alert": {
+        "queue": os.getenv("COMMUNITY_ALERT_QUEUE", "community-alerts"),
+    }
+}
+
+# Push notification defaults
+WEBPUSH_VAPID_PUBLIC_KEY = os.getenv("WEBPUSH_VAPID_PUBLIC_KEY", "test-public-key")
+WEBPUSH_VAPID_PRIVATE_KEY = os.getenv("WEBPUSH_VAPID_PRIVATE_KEY", "test-private-key")
+WEBPUSH_VAPID_CLAIM_SUBJECT = os.getenv("WEBPUSH_VAPID_CLAIM_SUBJECT", "mailto:admin@example.com")
+EXPO_ACCESS_TOKEN = os.getenv("EXPO_ACCESS_TOKEN", "")
+
+# Community hub alert deduplication defaults
+COMMUNITY_ALERT_DUPLICATE_WINDOW = int(os.getenv("COMMUNITY_ALERT_DUPLICATE_WINDOW", "900"))
+COMMUNITY_ALERT_DUPLICATE_THRESHOLD = float(
+    os.getenv("COMMUNITY_ALERT_DUPLICATE_THRESHOLD", "0.7")
+)

@@ -76,6 +76,7 @@ api_urlpatterns = [
     # User Groups and Roles
     path("user-groups/", UserGroupListView.as_view(), name="user-group-list"),
     path("user-roles/", UserRoleListView.as_view(), name="user-role-list"),
+    path("community/", include("communityhub.api.urls")),
 ]
 
 # Maintain the original name for backwards compatibility
