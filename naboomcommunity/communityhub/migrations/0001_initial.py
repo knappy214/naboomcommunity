@@ -18,6 +18,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(
+            "CREATE EXTENSION IF NOT EXISTS pg_trgm;",
+            reverse_sql="DROP EXTENSION IF EXISTS pg_trgm;",
+        ),
         migrations.CreateModel(
             name="ChannelModerationPolicy",
             fields=[
@@ -826,7 +830,6 @@ class Migration(migrations.Migration):
             index=django.contrib.postgres.indexes.GinIndex(
                 fields=["search_document"],
                 name="hub_thread_search_gin",
-                opclasses=["gin_trgm_ops"],
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -845,7 +848,6 @@ class Migration(migrations.Migration):
             index=django.contrib.postgres.indexes.GinIndex(
                 fields=["search_document"],
                 name="hub_post_search_gin",
-                opclasses=["gin_trgm_ops"],
             ),
         ),
         migrations.AddIndex(

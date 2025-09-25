@@ -92,39 +92,61 @@ class UserProfile(models.Model):
     
     @property
     def avatar_url(self):
-        """Get the URL of the user's avatar."""
+        """Get the URL of the user's avatar (medium size for better performance)."""
         if self.avatar:
-            return self.avatar.file.url
+            # Use medium size (150x150) as default for better performance
+            return self.get_avatar_medium()
         return None
     
     def get_avatar_small(self):
         """Get a small version of the avatar (50x50px)."""
         if self.avatar:
             try:
-                rendition = self.avatar.get_rendition('fill-50x50')
-                return rendition.url
+                from django.urls import reverse
+                from wagtail.images.utils import generate_signature
+                signature = generate_signature(self.avatar.id, 'fill-50x50')
+                return reverse('wagtailimages_serve', args=[signature, self.avatar.id, 'fill-50x50'])
             except Exception:
-                return self.avatar.file.url
+                # Fallback to original if rendition fails
+                return self.avatar_url()
         return None
     
     def get_avatar_medium(self):
         """Get a medium version of the avatar (150x150px)."""
         if self.avatar:
             try:
-                rendition = self.avatar.get_rendition('fill-150x150')
-                return rendition.url
+                from django.urls import reverse
+                from wagtail.images.utils import generate_signature
+                signature = generate_signature(self.avatar.id, 'fill-150x150')
+                return reverse('wagtailimages_serve', args=[signature, self.avatar.id, 'fill-150x150'])
             except Exception:
-                return self.avatar.file.url
+                # Fallback to original if rendition fails
+                return self.avatar_url()
         return None
     
     def get_avatar_large(self):
         """Get a large version of the avatar (300x300px)."""
         if self.avatar:
             try:
-                rendition = self.avatar.get_rendition('fill-300x300')
-                return rendition.url
+                from django.urls import reverse
+                from wagtail.images.utils import generate_signature
+                signature = generate_signature(self.avatar.id, 'fill-300x300')
+                return reverse('wagtailimages_serve', args=[signature, self.avatar.id, 'fill-300x300'])
             except Exception:
-                return self.avatar.file.url
+                # Fallback to original if rendition fails
+                return self.get_avatar_original()
+        return None
+    
+    def get_avatar_original(self):
+        """Get the original full-size avatar image."""
+        if self.avatar:
+            try:
+                from django.urls import reverse
+                from wagtail.images.utils import generate_signature
+                signature = generate_signature(self.avatar.id, 'original')
+                return reverse('wagtailimages_serve', args=[signature, self.avatar.id, 'original'])
+            except Exception:
+                return None
         return None
 
 

@@ -9,3 +9,11 @@ django-storages
 boto3
 pytest
 pytest-django
+# Community Hub dependencies
+channels
+channels-redis
+celery
+redis
+# Optional push notification dependencies
+exponent-server-sdk
+pywebpush

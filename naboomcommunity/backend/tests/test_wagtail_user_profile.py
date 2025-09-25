@@ -12,7 +12,7 @@ def test_wagtail_user_profile_requires_jwt(db):
     )
     client = APIClient()
     token_resp = client.post(
-        '/api/v2/auth/jwt/create/',
+        '/api/auth/jwt/create/',
         {'username': 'carol', 'password': 'pass12345'},
         format='json'
     )

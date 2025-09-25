@@ -384,7 +384,6 @@ class Thread(TimeStampedModel):
             GinIndex(
                 fields=["search_document"],
                 name="hub_thread_search_gin",
-                opclasses=["gin_trgm_ops"],
             ),
         ]
 
@@ -437,7 +436,6 @@ class Post(TimeStampedModel):
             GinIndex(
                 fields=["search_document"],
                 name="hub_post_search_gin",
-                opclasses=["gin_trgm_ops"],
             ),
         ]
 

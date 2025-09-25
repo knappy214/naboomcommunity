@@ -39,9 +39,19 @@ def serve_image(request, signature, image_id, filter_spec):
         if rendition.file and rendition.file.storage.exists(rendition.file.name):
             # Serve the file directly from S3
             file = rendition.file
+            
+            # Get content type safely
+            content_type = getattr(file, 'content_type', None)
+            if not content_type:
+                # Try to determine from file extension
+                import mimetypes
+                content_type, _ = mimetypes.guess_type(file.name)
+                if not content_type:
+                    content_type = 'image/jpeg'  # Default fallback
+            
             response = HttpResponse(
                 file.read(),
-                content_type=file.content_type or 'image/jpeg'
+                content_type=content_type
             )
             response['Content-Disposition'] = f'inline; filename="{file.name}"'
             return response

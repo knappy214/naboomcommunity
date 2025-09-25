@@ -65,13 +65,13 @@ All Wagtail API endpoints (`/api/v2/...`) require JWT authentication. Vue develo
 
 ### Getting JWT Token
 1. **Login via Django Admin**: POST to `/django-admin/login/` with username/password
-2. **Get JWT Token**: POST to `/api/v2/auth/login/` with credentials
+2. **Get JWT Token**: POST to `/api/auth/jwt/create/` with credentials
 3. **Include Token**: Add `Authorization: Bearer <token>` header to all API requests
 
 ### Vue.js Implementation Example
 ```javascript
 // 1. Login and get JWT token
-const loginResponse = await fetch('/api/v2/auth/login/', {
+const loginResponse = await fetch('/api/auth/jwt/create/', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

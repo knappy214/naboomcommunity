@@ -492,3 +492,13 @@ COMMUNITY_ALERT_DUPLICATE_WINDOW = int(os.getenv("COMMUNITY_ALERT_DUPLICATE_WIND
 COMMUNITY_ALERT_DUPLICATE_THRESHOLD = float(
     os.getenv("COMMUNITY_ALERT_DUPLICATE_THRESHOLD", "0.7")
 )
+
+# Django Channels configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")],
+        },
+    },
+}

@@ -190,13 +190,13 @@ class UserProfileAPIViewSet(BaseAPIViewSet):
             'avatar': {
                 'id': avatar.id,
                 'title': avatar.title,
-                'url': avatar.file.url,
+                'url': profile.avatar_url,  # Use the proper serving URL
                 'width': avatar.width,
                 'height': avatar.height,
                 'file_size': avatar.file.size,
                 'created_at': avatar.created_at,
                 'urls': {
-                    'original': profile.avatar_url,
+                    'original': profile.get_avatar_original(),
                     'small': profile.get_avatar_small(),
                     'medium': profile.get_avatar_medium(),
                     'large': profile.get_avatar_large()
