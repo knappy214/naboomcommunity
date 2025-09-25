@@ -20,12 +20,24 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 CSRF_TRUSTED_ORIGINS = [
     'https://naboomneighbornet.net.za',
     'https://www.naboomneighbornet.net.za',
+    'http://localhost:8081',  # For Expo development
+    'http://localhost:3000',  # For development
+    'http://localhost:5173',  # For Vue development
 ]
 
 # Production security headers
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+# CORS settings for development and production
+CORS_ALLOWED_ORIGINS = [
+    "https://naboomneighbornet.net.za",
+    "https://www.naboomneighbornet.net.za",
+    "http://localhost:8081",  # For Expo development
+    "http://localhost:3000",  # For development
+    "http://localhost:5173",  # For Vue development
+]
 
 try:
     from .local import *
