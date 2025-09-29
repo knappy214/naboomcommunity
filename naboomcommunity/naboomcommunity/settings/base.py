@@ -482,9 +482,17 @@ CELERY_TASK_ROUTES = {
 }
 
 # Push notification defaults
-WEBPUSH_VAPID_PUBLIC_KEY = os.getenv("WEBPUSH_VAPID_PUBLIC_KEY", "test-public-key")
-WEBPUSH_VAPID_PRIVATE_KEY = os.getenv("WEBPUSH_VAPID_PRIVATE_KEY", "test-private-key")
-WEBPUSH_VAPID_CLAIM_SUBJECT = os.getenv("WEBPUSH_VAPID_CLAIM_SUBJECT", "mailto:admin@example.com")
+#WEBPUSH_VAPID_PUBLIC_KEY = os.getenv("WEBPUSH_VAPID_PUBLIC_KEY", "test-public-key")
+#WEBPUSH_VAPID_PRIVATE_KEY = os.getenv("WEBPUSH_VAPID_PRIVATE_KEY", "test-private-key")
+#WEBPUSH_VAPID_CLAIM_SUBJECT = os.getenv("WEBPUSH_VAPID_CLAIM_SUBJECT", "mailto:admin@example.com")
+#EXPO_ACCESS_TOKEN = os.getenv("EXPO_ACCESS_TOKEN", "")
+
+# Push notification defaults using actual pem files
+WEBPUSH_SETTINGS = {
+    "VAPID_PRIVATE_KEY_FILE": os.getenv("VAPID_PRIVATE_KEY_FILE"),
+    "VAPID_PUBLIC_KEY_FILE": os.getenv("VAPID_PUBLIC_KEY_FILE"), 
+    "VAPID_ADMIN_EMAIL": os.getenv("VAPID_ADMIN_EMAIL")
+}
 EXPO_ACCESS_TOKEN = os.getenv("EXPO_ACCESS_TOKEN", "")
 
 # Community hub alert deduplication defaults
