@@ -1,0 +1,101 @@
+[Unit]
+Description=Naboom MQTT Subscriber for Panic System (Python 3.12.3 + Mosquitto 2.0.22)
+After=network-online.target mosquitto.service redis-server.service postgresql.service
+Wants=network-online.target
+Requires=mosquitto.service redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 environment optimizations
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Django 5.2 settings
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+
+# MQTT specific settings for Mosquitto 2.0.22 integration
+Environment=MQTT_KEEPALIVE=60
+Environment=MQTT_QOS=1
+Environment=MQTT_CLEAN_SESSION=False
+Environment=MQTT_PROTOCOL_VERSION=5
+
+# Enhanced MQTT subscriber with error handling and reconnection
+ExecStart=/opt/naboomcommunity/venv/bin/python manage.py mqtt_subscriber \
+    --verbosity=1 \
+    --log-file=/var/log/naboom/mqtt/subscriber.log \
+    --max-reconnect-attempts=10 \
+    --reconnect-delay=5
+
+# Alternative: Use dedicated MQTT management command with monitoring
+# ExecStart=/opt/naboomcommunity/venv/bin/python -c "
+# import django; django.setup()
+# from panic.management.commands.mqtt_subscriber import Command
+# Command().handle(verbosity=1, log_file='/var/log/naboom/mqtt/subscriber.log')
+# "
+
+# Process management with enhanced restart logic
+Restart=always
+RestartSec=10
+StartLimitInterval=600
+StartLimitBurst=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Resource limits for MQTT processing
+LimitNOFILE=4096
+LimitNPROC=1024
+
+# Memory optimizations for Python 3.12.3
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom
+
+# Logging with structured output
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-mqtt
+
+# Health monitoring and graceful shutdown
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+# Wait for dependencies to be ready
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet mosquitto; do sleep 2; done'
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet redis-server; do sleep 2; done'
+
+# Verify MQTT connection after startup
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/bin/bash -c 'echo "MQTT subscriber started and connected to broker" | systemd-cat -t naboom-mqtt'
+
+# Connection monitoring (optional health check)
+ExecStartPost=/opt/naboomcommunity/venv/bin/python -c "
+import paho.mqtt.client as mqtt
+import sys
+try:
+    client = mqtt.Client()
+    client.username_pw_set('${MQTT_USER}', '${MQTT_PASSWORD}')
+    client.connect('${MQTT_HOST}', int('${MQTT_PORT}'), 60)
+    print('MQTT connection test successful')
+    client.disconnect()
+except Exception as e:
+    print(f'MQTT connection test failed: {e}')
+    sys.exit(1)
+"
+
+[Install]
+WantedBy=multi-user.target

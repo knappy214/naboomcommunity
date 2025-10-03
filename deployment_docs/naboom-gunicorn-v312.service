@@ -1,0 +1,90 @@
+[Unit]
+Description=Naboom Community Gunicorn HTTP Server (Python 3.12.3 + Django 5.2)
+After=network.target redis-server.service postgresql.service
+Wants=network.target
+Requires=redis-server.service postgresql.service
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 optimizations
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Gunicorn with Django 5.2 + Python 3.12.3 optimizations
+ExecStart=/opt/naboomcommunity/venv/bin/gunicorn \
+    naboomcommunity.wsgi:application \
+    --bind 127.0.0.1:8001 \
+    --workers 6 \
+    --worker-class sync \
+    --threads 4 \
+    --worker-connections 2000 \
+    --timeout 120 \
+    --graceful-timeout 60 \
+    --max-requests 2000 \
+    --max-requests-jitter 100 \
+    --keepalive 10 \
+    --preload \
+    --enable-stdio-inheritance \
+    --access-logfile /var/log/naboom/gunicorn/access.log \
+    --error-logfile /var/log/naboom/gunicorn/error.log \
+    --log-level info \
+    --capture-output \
+    --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s %(L)s'
+
+# Alternative backup server (commented out - enable if needed)
+# ExecStartPost=/bin/sleep 2
+# ExecStartPost=/opt/naboomcommunity/venv/bin/gunicorn \
+#     naboomcommunity.wsgi:application \
+#     --bind 127.0.0.1:8002 \
+#     --workers 2 \
+#     --worker-class sync \
+#     --daemon
+
+# Process management
+PIDFile=/run/gunicorn/naboom.pid
+Restart=always
+RestartSec=10
+StartLimitInterval=600
+StartLimitBurst=3
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=60
+
+# Resource limits (adjust based on server capacity)
+LimitNOFILE=65536
+LimitNPROC=32768
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom /var/www/naboomcommunity
+
+# Python 3.12.3 memory optimizations
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+Environment=MALLOC_MMAP_THRESHOLD_=131072
+
+# Django 5.2 specific settings
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-gunicorn
+
+# Health check
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target

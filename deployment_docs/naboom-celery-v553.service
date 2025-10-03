@@ -1,0 +1,91 @@
+[Unit]
+Description=Naboom Community Celery Worker (Celery 5.5.3 + Python 3.12.3)
+After=network.target redis-server.service postgresql.service
+Wants=network.target
+Requires=redis-server.service postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 environment optimizations
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Celery 5.5.3 with enhanced features and monitoring
+ExecStart=/opt/naboomcommunity/venv/bin/celery -A naboomcommunity worker \
+    --loglevel=info \
+    --concurrency=8 \
+    --queues=high_priority,notifications,low_priority,celery \
+    --pool=prefork \
+    --max-tasks-per-child=2000 \
+    --max-memory-per-child=400000 \
+    --time-limit=600 \
+    --soft-time-limit=540 \
+    --prefetch-multiplier=4 \
+    --without-gossip \
+    --without-mingle \
+    --without-heartbeat \
+    --optimization=fair \
+    --events \
+    --task-events \
+    --send-task-events \
+    --logfile=/var/log/naboom/celery/worker-%n.log \
+    --pidfile=/var/run/celery/worker-%n.pid
+
+# Celery 5.5.3 monitoring and performance features
+Environment=CELERY_SEND_TASK_EVENTS=true
+Environment=CELERY_TASK_SEND_SENT_EVENT=true
+Environment=CELERY_WORKER_HIJACK_ROOT_LOGGER=false
+Environment=CELERY_WORKER_LOG_COLOR=false
+
+# Process management with enhanced restart logic
+Restart=always
+RestartSec=15
+StartLimitInterval=600
+StartLimitBurst=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=120
+TimeoutStopSec=120
+
+# Resource limits for production workload
+LimitNOFILE=65536
+LimitNPROC=32768
+
+# Memory management for Python 3.12.3
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+Environment=MALLOC_MMAP_THRESHOLD_=131072
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom /var/run/celery
+
+# Create PID directory
+RuntimeDirectory=celery
+RuntimeDirectoryMode=0755
+
+# Logging with structured format
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-celery
+
+# Graceful shutdown handling
+ExecStop=/bin/kill -TERM $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Health monitoring (Celery 5.5.3 feature)
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/bin/bash -c 'echo "Celery worker started successfully" | systemd-cat -t naboom-celery'
+
+[Install]
+WantedBy=multi-user.target

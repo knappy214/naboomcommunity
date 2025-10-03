@@ -1,0 +1,91 @@
+[Unit]
+Description=Naboom Community Daphne ASGI/WebSocket Server (Django 5.2 + Channels 4.0)
+After=network.target redis-server.service
+Wants=network.target
+Requires=redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 environment optimizations
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Django 5.2 + Channels 4.0 specific settings
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+Environment=CHANNELS_REDIS_DB=1
+
+# Daphne ASGI server with enhanced WebSocket support
+ExecStart=/opt/naboomcommunity/venv/bin/daphne \
+    -b 127.0.0.1 \
+    -p 9000 \
+    --proxy-headers \
+    --root-path=/opt/naboomcommunity \
+    --verbosity 1 \
+    --access-log /var/log/naboom/daphne/access.log \
+    --server-name naboom-daphne \
+    --application-close-timeout 60 \
+    --websocket_timeout 86400 \
+    --websocket_connect_timeout 30 \
+    naboomcommunity.asgi:application
+
+# Alternative Daphne instance for load balancing (commented out)
+# ExecStartPost=/bin/sleep 3
+# ExecStartPost=/opt/naboomcommunity/venv/bin/daphne \
+#     -b 127.0.0.1 \
+#     -p 9001 \
+#     --proxy-headers \
+#     --daemon \
+#     naboomcommunity.asgi:application
+
+# Process management with enhanced reliability
+Restart=always
+RestartSec=10
+StartLimitInterval=600
+StartLimitBurst=3
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=60
+
+# Resource limits for WebSocket connections
+LimitNOFILE=65536
+LimitNPROC=16384
+
+# Memory optimizations for Python 3.12.3
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+Environment=MALLOC_MMAP_THRESHOLD_=131072
+
+# WebSocket and ASGI specific optimizations
+Environment=ASGI_THREADS=4
+Environment=CHANNELS_CAPACITY=2000
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom
+
+# Logging with structured output
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-daphne
+
+# Health monitoring
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+# WebSocket connection monitoring
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/bin/bash -c 'echo "Daphne ASGI server started successfully on port 9000" | systemd-cat -t naboom-daphne'
+
+[Install]
+WantedBy=multi-user.target

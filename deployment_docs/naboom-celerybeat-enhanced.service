@@ -1,0 +1,89 @@
+[Unit]
+Description=Naboom Community Celery Beat Scheduler (Celery 5.5.3 + Django 5.2)
+After=network.target redis-server.service postgresql.service naboom-celery.service
+Wants=network.target
+Requires=redis-server.service postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 environment optimizations
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Django 5.2 specific settings
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+
+# Celery 5.5.3 beat scheduler with enhanced monitoring
+ExecStart=/opt/naboomcommunity/venv/bin/celery -A naboomcommunity beat \
+    --loglevel=info \
+    --scheduler django_celery_beat.schedulers:DatabaseScheduler \
+    --max-interval=300 \
+    --pidfile=/var/run/celery/celerybeat.pid \
+    --logfile=/var/log/naboom/celery/beat.log \
+    --detach=no
+
+# Celery 5.5.3 beat specific optimizations
+Environment=CELERY_BEAT_SCHEDULE_FILENAME=/var/lib/celery/celerybeat-schedule
+Environment=CELERY_BEAT_MAX_LOOP_INTERVAL=300
+Environment=CELERY_BEAT_SYNC_EVERY=0
+
+# Enhanced scheduling features for Celery 5.5.3
+Environment=DJANGO_CELERY_BEAT_TZ_AWARE=true
+Environment=CELERY_TIMEZONE=Africa/Johannesburg
+
+# Process management with improved reliability
+Restart=always
+RestartSec=20
+StartLimitInterval=600
+StartLimitBurst=3
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=120
+TimeoutStopSec=60
+
+# Resource limits
+LimitNOFILE=4096
+LimitNPROC=1024
+
+# Memory management for Python 3.12.3
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom /var/run/celery /var/lib/celery
+
+# Create required directories
+RuntimeDirectory=celery
+RuntimeDirectoryMode=0755
+StateDirectory=celery
+StateDirectoryMode=0755
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-celerybeat
+
+# Graceful shutdown and monitoring
+ExecStop=/bin/kill -TERM $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Health check for beat scheduler
+ExecStartPost=/bin/sleep 10
+ExecStartPost=/bin/bash -c 'echo "Celery Beat scheduler started successfully" | systemd-cat -t naboom-celerybeat'
+
+# Ensure beat doesn't start before worker is ready
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet naboom-celery; do sleep 2; done'
+
+[Install]
+WantedBy=multi-user.target
