@@ -1,0 +1,128 @@
+# ==========================================================
+# /etc/nginx/sites-available/naboomneighbornet.net.za
+# ----------------------------------------------------------
+# Merged server blocks
+# ==========================================================
+
+# HTTP: serve ACME challenge then redirect everything else to HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name naboomneighbornet.net.za www.naboomneighbornet.net.za;
+
+    # ACME HTTP-01 (Certbot)
+    location ^~ /.well-known/acme-challenge/ {
+        alias /var/www/_letsencrypt/;   # files live directly here; mapped under /.well-known/acme-challenge/
+        default_type text/plain;         # why: ACME requires plain text
+        try_files $uri =404;             # why: no redirect, exact file only
+    }
+
+    # Redirect all other traffic to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS: main site + API
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name naboomneighbornet.net.za www.naboomneighbornet.net.za;
+
+    # ---- TLS (managed by Certbot) ----
+    ssl_certificate     /etc/letsencrypt/live/naboomneighbornet.net.za/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/naboomneighbornet.net.za/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # --- Security headers (tune CSP if you use external assets) ---
+    add_header X-Frame-Options "SAMEORIGIN" always;          # why: prevent clickjacking
+    add_header X-Content-Type-Options "nosniff" always;       # why: block MIME sniffing
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: blob: https://s3.naboomneighbornet.net.za https://www.gravatar.com https://*.gravatar.com; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self'; upgrade-insecure-requests" always;# HSTS: enable after confirming HTTPS everywhere (optional)
+    # add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    # Allow larger file uploads via Wagtail admin
+    client_max_body_size 50m;
+
+    # --------------------
+    # API (rate limited)
+    # --------------------
+    location /api/ {
+        limit_req zone=naboom_api burst=20 nodelay;  # 10 r/s steady, burst 20
+        limit_req_status 429;
+
+	# proxy_pass http://unix:/run/naboom_gunicorn.sock:;
+	proxy_pass http://127.0.0.1:8001;           # keep your current upstream
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme; # stay aligned with Django's SECURE_PROXY_SSL_HEADER
+        proxy_read_timeout 60s;
+        proxy_redirect off;
+        # CORS: let Django/django-cors-headers handle; don't add here.
+    }
+
+    # --------------------
+    # Application (Wagtail)
+    # --------------------
+    location / {
+	    #proxy_pass http://unix:/run/naboom_gunicorn.sock:;
+	proxy_pass http://127.0.0.1:8001;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+        proxy_redirect off;
+    }
+
+    # --------------------
+    # Static files
+    # --------------------
+    location /static/ {
+        alias /var/www/naboomcommunity/naboomcommunity/static/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # --------------------
+    # Media files (user uploads)
+    # --------------------
+    location /media/ {
+        alias /var/www/naboomcommunity/naboomcommunity/media/;
+        expires 30d;
+        add_header Cache-Control "public";  # avoid immutable for user-generated files
+    }
+    location /panic/ {  # Custom panic endpoints
+	    #proxy_pass http://naboom_app;
+	proxy_pass http://127.0.0.1:8001;
+        include /etc/nginx/snippets/proxy-common.conf;
+    }
+
+    # SSE: must disable buffering
+    location = /panic/api/stream {
+	    #proxy_pass http://naboom_app;
+	proxy_pass http://127.0.0.1:8001;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+        proxy_buffering off;
+        add_header X-Accel-Buffering no;
+        # CORS for SSE: usually handled by Django CORS; if needed, uncomment and restrict origins
+        # add_header Access-Control-Allow-Origin https://your.domain always;
+    }
+
+    # Vehicle ping: add a simple rate limit (shared zone defined below)
+    location = /panic/api/vehicle/ping {
+        limit_req zone=veh burst=10 nodelay;
+	#proxy_pass http://naboom_app;
+	proxy_pass http://127.0.0.1:8001;
+        include /etc/nginx/snippets/proxy-common.conf;
+    }
+}
+limit_req_zone $binary_remote_addr zone=veh:10m rate=30r/m;
