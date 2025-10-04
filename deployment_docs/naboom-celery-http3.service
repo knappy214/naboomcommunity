@@ -1,0 +1,133 @@
+[Unit]
+Description=Naboom Community Celery Worker (HTTP/3 Task Processing Optimized)
+After=network.target redis-server.service postgresql.service
+Wants=network.target
+Requires=redis-server.service postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 optimizations for HTTP/3 task processing
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Celery 5.5.3 + HTTP/3 backend integration
+Environment=CELERY_VERSION=5.5.3
+Environment=HTTP3_TASK_PROCESSING=enabled
+
+# Celery worker optimized for HTTP/3 multiplexed task loads
+ExecStart=/opt/naboomcommunity/venv/bin/celery -A naboomcommunity worker \
+    --loglevel=info \
+    --concurrency=12 \
+    --queues=http3_priority,panic_emergency,notifications,background,celery \
+    --pool=prefork \
+    --max-tasks-per-child=3000 \
+    --max-memory-per-child=600000 \
+    --time-limit=900 \
+    --soft-time-limit=810 \
+    --prefetch-multiplier=6 \
+    --without-gossip \
+    --without-mingle \
+    --without-heartbeat \
+    --optimization=fair \
+    --events \
+    --task-events \
+    --send-task-events \
+    --logfile=/var/log/naboom/celery/worker-http3-%n.log \
+    --pidfile=/var/run/celery/worker-http3-%n.pid
+
+# HTTP/3 specific task routing
+Environment=CELERY_ROUTES={
+    'panic.tasks.emergency_notification': {'queue': 'http3_priority'},
+    'panic.tasks.send_sms_task': {'queue': 'http3_priority'},
+    'communityhub.tasks.web_push_notification': {'queue': 'http3_priority'},
+    'communityhub.tasks.real_time_update': {'queue': 'http3_priority'},
+    'core.tasks.http3_analytics': {'queue': 'background'},
+    'core.tasks.connection_cleanup': {'queue': 'background'}
+}
+
+# Celery 5.5.3 HTTP/3 performance features
+Environment=CELERY_SEND_TASK_EVENTS=true
+Environment=CELERY_TASK_SEND_SENT_EVENT=true
+Environment=CELERY_WORKER_HIJACK_ROOT_LOGGER=false
+Environment=CELERY_WORKER_LOG_COLOR=false
+
+# HTTP/3 task processing optimizations
+Environment=CELERY_TASK_ALWAYS_EAGER=false
+Environment=CELERY_TASK_EAGER_PROPAGATES=true
+Environment=CELERY_TASK_REJECT_ON_WORKER_LOST=true
+Environment=CELERY_WORKER_DISABLE_RATE_LIMITS=true
+
+# HTTP/3 result backend optimization
+Environment=CELERY_RESULT_EXPIRES=7200
+Environment=CELERY_RESULT_PERSISTENT=true
+Environment=CELERY_CACHE_BACKEND_OPTIONS={
+    'health_check_interval': 30,
+    'retry_on_timeout': true
+}
+
+# Process management for HTTP/3 workload
+Restart=always
+RestartSec=20
+StartLimitInterval=600
+StartLimitBurst=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=180
+TimeoutStopSec=120
+
+# Enhanced resource limits for HTTP/3 task processing
+LimitNOFILE=131072
+LimitNPROC=65536
+LimitMEMLOCK=infinity
+
+# Memory management for Python 3.12.3 + HTTP/3 tasks
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+Environment=MALLOC_MMAP_THRESHOLD_=131072
+
+# HTTP/3 specific worker settings
+Environment=WORKER_MAX_MEMORY_PER_CHILD=600MB
+Environment=WORKER_POOL_RESTARTS=10
+Environment=HTTP3_TASK_TIMEOUT=900
+
+# Security hardening for HTTP/3 task processing
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom /var/run/celery
+
+# Create runtime directories for HTTP/3 worker management
+RuntimeDirectory=celery
+RuntimeDirectoryMode=0755
+StateDirectory=celery
+StateDirectoryMode=0755
+
+# Logging optimized for HTTP/3 task analysis
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-celery-http3
+
+# Graceful shutdown for HTTP/3 task completion
+ExecStop=/bin/bash -c '/opt/naboomcommunity/venv/bin/celery -A naboomcommunity control shutdown || kill -TERM $MAINPID'
+ExecReload=/bin/kill -HUP $MAINPID
+
+# HTTP/3 worker health monitoring
+ExecStartPost=/bin/sleep 15
+ExecStartPost=/bin/bash -c 'timeout 30 /opt/naboomcommunity/venv/bin/celery -A naboomcommunity inspect ping >/dev/null 2>&1 && echo "Celery HTTP/3 worker started successfully" | systemd-cat -t naboom-celery || echo "Celery HTTP/3 worker startup verification failed" | systemd-cat -t naboom-celery'
+
+# HTTP/3 task queue monitoring
+ExecStartPost=/bin/bash -c 'sleep 5; /opt/naboomcommunity/venv/bin/celery -A naboomcommunity inspect active | head -20 | systemd-cat -t naboom-celery-status'
+
+# Periodic health check for HTTP/3 processing
+ExecStartPost=/bin/bash -c 'echo "0 */2 * * * /opt/naboomcommunity/venv/bin/celery -A naboomcommunity inspect ping >/dev/null || systemctl restart naboom-celery" | crontab -u www-data - 2>/dev/null || true'
+
+[Install]
+WantedBy=multi-user.target

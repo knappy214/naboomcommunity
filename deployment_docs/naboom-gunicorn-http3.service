@@ -1,0 +1,138 @@
+[Unit]
+Description=Naboom Community Gunicorn HTTP Server (HTTP/3 Backend Optimized)
+After=network.target redis-server.service postgresql.service
+Wants=network.target
+Requires=redis-server.service postgresql.service
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 optimizations for HTTP/3 backend
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# HTTP/3 backend performance optimizations
+Environment=PYTHONMALLOCSTATS=0
+Environment=PYTHONDEVMODE=0
+
+# Gunicorn optimized for HTTP/3 multiplexed requests
+ExecStart=/opt/naboomcommunity/venv/bin/gunicorn \
+    naboomcommunity.wsgi:application \
+    --bind 127.0.0.1:8001 \
+    --workers 8 \
+    --worker-class sync \
+    --threads 6 \
+    --worker-connections 2000 \
+    --timeout 180 \
+    --graceful-timeout 90 \
+    --max-requests 3000 \
+    --max-requests-jitter 150 \
+    --keepalive 15 \
+    --preload \
+    --enable-stdio-inheritance \
+    --access-logfile /var/log/naboom/gunicorn/access.log \
+    --error-logfile /var/log/naboom/gunicorn/error.log \
+    --log-level info \
+    --capture-output \
+    --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s %(L)s %(p)s'
+
+# Backup Gunicorn instances for load balancing
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/opt/naboomcommunity/venv/bin/gunicorn \
+    naboomcommunity.wsgi:application \
+    --bind 127.0.0.1:8002 \
+    --workers 4 \
+    --worker-class sync \
+    --threads 4 \
+    --worker-connections 1500 \
+    --timeout 180 \
+    --graceful-timeout 90 \
+    --max-requests 2000 \
+    --max-requests-jitter 100 \
+    --keepalive 15 \
+    --preload \
+    --daemon \
+    --access-logfile /var/log/naboom/gunicorn/access-backup.log \
+    --error-logfile /var/log/naboom/gunicorn/error-backup.log \
+    --pid /var/run/gunicorn/naboom-backup.pid
+
+# Third backup instance for high availability
+ExecStartPost=/bin/sleep 3
+ExecStartPost=/opt/naboomcommunity/venv/bin/gunicorn \
+    naboomcommunity.wsgi:application \
+    --bind 127.0.0.1:8003 \
+    --workers 2 \
+    --worker-class sync \
+    --threads 3 \
+    --worker-connections 1000 \
+    --timeout 180 \
+    --graceful-timeout 90 \
+    --max-requests 1500 \
+    --max-requests-jitter 75 \
+    --keepalive 15 \
+    --preload \
+    --daemon \
+    --access-logfile /var/log/naboom/gunicorn/access-backup2.log \
+    --error-logfile /var/log/naboom/gunicorn/error-backup2.log \
+    --pid /var/run/gunicorn/naboom-backup2.pid
+
+# Process management optimized for HTTP/3 workload
+PIDFile=/var/run/gunicorn/naboom.pid
+Restart=always
+RestartSec=8
+StartLimitInterval=600
+StartLimitBurst=3
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=120
+TimeoutStopSec=90
+
+# Enhanced resource limits for HTTP/3 multiplexing
+LimitNOFILE=131072
+LimitNPROC=65536
+LimitMEMLOCK=infinity
+
+# Memory optimizations for Python 3.12.3 + HTTP/3 workload
+Environment=MALLOC_TRIM_THRESHOLD_=65536
+Environment=MALLOC_MMAP_THRESHOLD_=65536
+Environment=MALLOC_TOP_PAD_=131072
+
+# Django 5.2 + HTTP/3 specific settings
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+Environment=HTTP3_BACKEND_OPTIMIZED=true
+
+# HTTP/3 performance tuning
+Environment=GUNICORN_HTTP3_OPTIMIZED=1
+Environment=WORKER_MEMORY_LIMIT=512MB
+
+# Security hardening for HTTP/3 production
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom /var/www/naboomcommunity /var/run/gunicorn
+
+# Logging optimized for HTTP/3 analysis
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-gunicorn-http3
+
+# Enhanced health monitoring for HTTP/3
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/bash -c 'kill -TERM $MAINPID; kill -TERM $(cat /var/run/gunicorn/naboom-backup.pid 2>/dev/null || echo 0); kill -TERM $(cat /var/run/gunicorn/naboom-backup2.pid 2>/dev/null || echo 0)'
+
+# HTTP/3 readiness check
+ExecStartPost=/bin/sleep 10
+ExecStartPost=/bin/bash -c 'curl -s -f http://127.0.0.1:8001/health >/dev/null && echo "Primary Gunicorn HTTP/3 backend ready" | systemd-cat -t naboom-gunicorn'
+ExecStartPost=/bin/bash -c 'curl -s -f http://127.0.0.1:8002/health >/dev/null && echo "Backup Gunicorn HTTP/3 backend ready" | systemd-cat -t naboom-gunicorn || true'
+ExecStartPost=/bin/bash -c 'curl -s -f http://127.0.0.1:8003/health >/dev/null && echo "Secondary backup Gunicorn HTTP/3 backend ready" | systemd-cat -t naboom-gunicorn || true'
+
+[Install]
+WantedBy=multi-user.target

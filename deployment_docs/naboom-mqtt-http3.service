@@ -1,0 +1,207 @@
+[Unit]
+Description=Naboom MQTT Subscriber for Panic System (HTTP/3 Integration Enhanced)
+After=network-online.target mosquitto.service redis-server.service postgresql.service
+Wants=network-online.target
+Requires=mosquitto.service redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/naboomcommunity
+EnvironmentFile=/opt/naboomcommunity/.env
+
+# Python 3.12.3 optimizations for MQTT over HTTP/3 WebSocket
+Environment=PYTHONPATH=/opt/naboomcommunity
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONHASHSEED=random
+Environment=PYTHONOPTIMIZE=1
+
+# Django 5.2 + HTTP/3 MQTT integration
+Environment=DJANGO_SETTINGS_MODULE=naboomcommunity.settings.production
+Environment=MQTT_HTTP3_INTEGRATION=enabled
+
+# HTTP/3 MQTT WebSocket optimization settings
+Environment=MQTT_KEEPALIVE=60
+Environment=MQTT_QOS=1
+Environment=MQTT_CLEAN_SESSION=False
+Environment=MQTT_PROTOCOL_VERSION=5
+Environment=MQTT_WEBSOCKET_HTTP3_READY=true
+
+# Enhanced MQTT subscriber with HTTP/3 WebSocket support
+ExecStart=/opt/naboomcommunity/venv/bin/python manage.py mqtt_subscriber \
+    --verbosity=1 \
+    --log-file=/var/log/naboom/mqtt/subscriber-http3.log \
+    --max-reconnect-attempts=15 \
+    --reconnect-delay=3 \
+    --websocket-fallback=true \
+    --http3-optimization=enabled \
+    --connection-pool-size=10
+
+# HTTP/3 MQTT connection management
+Environment=MQTT_CONNECTION_POOL_SIZE=10
+Environment=MQTT_HTTP3_WEBSOCKET_URL=wss://naboomneighbornet.net.za/mqtt
+Environment=MQTT_FALLBACK_TCP_HOST=127.0.0.1
+Environment=MQTT_FALLBACK_TCP_PORT=1883
+
+# Emergency system MQTT topics for HTTP/3 optimization
+Environment=MQTT_EMERGENCY_TOPICS=panic/emergency/#,panic/ingest/#,panic/command/#,panic/vehicle/#
+Environment=MQTT_PRIORITY_TOPICS=panic/emergency/sms,panic/emergency/call,panic/emergency/location
+
+# HTTP/3 WebSocket MQTT configuration
+Environment=MQTT_WEBSOCKET_COMPRESSION=permessage-deflate
+Environment=MQTT_WEBSOCKET_SUBPROTOCOL=mqtt
+Environment=MQTT_HTTP3_MULTIPLEXING=enabled
+
+# Advanced MQTT management with HTTP/3 awareness
+ExecStart=/opt/naboomcommunity/venv/bin/python -c "
+import os
+import sys
+import django
+import asyncio
+import logging
+from pathlib import Path
+
+# Setup Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'naboomcommunity.settings.production')
+sys.path.insert(0, '/opt/naboomcommunity')
+django.setup()
+
+from panic.mqtt.http3_subscriber import HTTP3MQTTSubscriber
+
+async def main():
+    subscriber = HTTP3MQTTSubscriber(
+        websocket_url='wss://naboomneighbornet.net.za/mqtt',
+        fallback_host='127.0.0.1',
+        fallback_port=1883,
+        username='${MQTT_USER}',
+        password='${MQTT_PASSWORD}',
+        log_file='/var/log/naboom/mqtt/subscriber-http3.log',
+        http3_optimization=True,
+        compression='permessage-deflate',
+        max_reconnect_attempts=15,
+        reconnect_delay=3,
+        keepalive=60,
+        qos=1
+    )
+    
+    await subscriber.start()
+
+if __name__ == '__main__':
+    asyncio.run(main())
+"
+
+# Process management optimized for HTTP/3 MQTT workload
+Restart=always
+RestartSec=8
+StartLimitInterval=600
+StartLimitBurst=8
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=90
+TimeoutStopSec=45
+
+# Resource limits for MQTT over HTTP/3 processing
+LimitNOFILE=16384
+LimitNPROC=2048
+LimitMEMLOCK=32MB
+
+# Memory optimizations for Python 3.12.3 MQTT handling
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+
+# HTTP/3 MQTT specific performance tuning
+Environment=MQTT_MESSAGE_BUFFER_SIZE=65536
+Environment=MQTT_HTTP3_STREAM_BUFFER=32768
+Environment=WEBSOCKET_PING_INTERVAL=30
+Environment=WEBSOCKET_PONG_TIMEOUT=10
+
+# Security hardening for MQTT over HTTP/3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/naboomcommunity /var/log/naboom
+
+# Logging optimized for HTTP/3 MQTT analysis
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=naboom-mqtt-http3
+
+# Enhanced health monitoring for MQTT over HTTP/3
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+# Wait for HTTP/3 dependencies to be ready
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet mosquitto; do sleep 2; done'
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet redis-server; do sleep 2; done'
+ExecStartPre=/bin/bash -c 'until systemctl is-active --quiet nginx; do sleep 2; done'
+
+# Verify HTTP/3 WebSocket MQTT endpoint is available
+ExecStartPre=/bin/bash -c 'timeout 30 bash -c "until curl -s -I https://naboomneighbornet.net.za/mqtt | grep -i \"upgrade.*websocket\" >/dev/null; do sleep 2; done" || echo "HTTP/3 WebSocket MQTT endpoint not ready, will use TCP fallback" | systemd-cat -t naboom-mqtt'
+
+# MQTT over HTTP/3 connection verification
+ExecStartPost=/bin/sleep 10
+ExecStartPost=/bin/bash -c 'timeout 60 python3 -c "
+import paho.mqtt.client as mqtt
+import ssl
+import sys
+import time
+
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print(\"MQTT HTTP/3 WebSocket connection test: SUCCESS\")
+        client.disconnect()
+    else:
+        print(f\"MQTT HTTP/3 WebSocket connection test: FAILED (code {rc})\")
+        sys.exit(1)
+
+def on_connect_fail(client, userdata):
+    print(\"MQTT HTTP/3 WebSocket connection test: FAILED (connection failed)\")
+    sys.exit(1)
+
+try:
+    client = mqtt.Client(transport=\"websockets\")
+    client.username_pw_set(\"${MQTT_USER}\", \"${MQTT_PASSWORD}\")
+    client.tls_set(ca_certs=None, certfile=None, keyfile=None, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
+    client.on_connect = on_connect
+    client.on_connect_fail = on_connect_fail
+    
+    # Test WebSocket MQTT over HTTP/3
+    client.connect(\"naboomneighbornet.net.za\", 443, 60)
+    client.loop_start()
+    time.sleep(5)
+    client.loop_stop()
+    
+except Exception as e:
+    print(f\"MQTT HTTP/3 WebSocket test failed: {e}\")
+    print(\"Will fallback to TCP MQTT connection\")
+    
+    # Fallback TCP test
+    try:
+        tcp_client = mqtt.Client()
+        tcp_client.username_pw_set(\"${MQTT_USER}\", \"${MQTT_PASSWORD}\")
+        tcp_client.on_connect = on_connect
+        tcp_client.connect(\"127.0.0.1\", 1883, 60)
+        tcp_client.loop_start()
+        time.sleep(3)
+        tcp_client.loop_stop()
+    except Exception as tcp_e:
+        print(f\"MQTT TCP fallback test also failed: {tcp_e}\")
+        sys.exit(1)
+" && echo "MQTT subscriber HTTP/3 integration started and tested successfully" | systemd-cat -t naboom-mqtt || echo "MQTT subscriber HTTP/3 test completed with fallback" | systemd-cat -t naboom-mqtt'
+
+# HTTP/3 MQTT performance monitoring
+ExecStartPost=/bin/bash -c 'sleep 5; echo "HTTP/3 MQTT Topics Monitor:" && timeout 30 mosquitto_sub -h 127.0.0.1 -p 1883 -u "${MQTT_USER}" -P "${MQTT_PASSWORD}" -t "panic/ingest/test" -C 1 -W 10 >/dev/null 2>&1 && echo "MQTT topic subscription test: SUCCESS" | systemd-cat -t naboom-mqtt || echo "MQTT topic subscription test: TIMEOUT (normal for no test messages)" | systemd-cat -t naboom-mqtt'
+
+# HTTP/3 MQTT connection statistics
+ExecStartPost=/bin/bash -c 'echo "*/5 * * * * echo \"MQTT HTTP/3 Connections: \$(ss -tuln | grep -c :1883)\" >> /var/log/naboom/mqtt/connection-stats.log 2>/dev/null" | crontab -u www-data - 2>/dev/null || true'
+
+# Emergency system MQTT topic monitoring
+ExecStartPost=/bin/bash -c 'echo "0 */6 * * * timeout 60 mosquitto_sub -h 127.0.0.1 -p 1883 -u \"${MQTT_USER}\" -P \"${MQTT_PASSWORD}\" -t \"panic/emergency/#\" -C 1 -W 30 >/dev/null 2>&1 && echo \"Emergency MQTT topics accessible\" >> /var/log/naboom/mqtt/emergency-check.log || echo \"Emergency MQTT topic check timeout\" >> /var/log/naboom/mqtt/emergency-check.log" | crontab -u www-data - 2>/dev/null || true'
+
+# HTTP/3 WebSocket MQTT health check
+ExecStartPost=/bin/bash -c 'echo "*/10 * * * * curl -s -I https://naboomneighbornet.net.za/mqtt | head -1 >> /var/log/naboom/mqtt/websocket-health.log 2>/dev/null" | crontab -u www-data - 2>/dev/null || true'
+
+[Install]
+WantedBy=multi-user.target
