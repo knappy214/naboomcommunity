@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.api.v2.views import BaseAPIViewSet
 
@@ -12,6 +14,20 @@ class IncidentAPIViewSet(BaseAPIViewSet):
     name = "panic-incidents"
     model = Incident
     serializer_class = IncidentSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def authenticate_user(self, request) -> bool:
+        """Authenticate request using JWT token."""
+        authenticator = JWTAuthentication()
+        try:
+            user_auth = authenticator.authenticate(request)
+            if user_auth is None:
+                return False
+            request.user, _ = user_auth
+            return True
+        except Exception:
+            return False
 
     def get_queryset(self):
         return (
@@ -21,6 +37,9 @@ class IncidentAPIViewSet(BaseAPIViewSet):
         )
 
     def listing_view(self, request):
+        if not self.authenticate_user(request):
+            return JsonResponse({"detail": "Authentication credentials were not provided."}, status=401)
+            
         queryset = self.get_queryset()
         status = request.GET.get("status")
         province = request.GET.get("province")
@@ -37,6 +56,9 @@ class IncidentAPIViewSet(BaseAPIViewSet):
         return JsonResponse({"meta": {"total_count": queryset.count()}, "items": items})
 
     def detail_view(self, request, pk):
+        if not self.authenticate_user(request):
+            return JsonResponse({"detail": "Authentication credentials were not provided."}, status=401)
+            
         incident = self.get_queryset().filter(pk=pk).first()
         if not incident:
             return JsonResponse({"detail": "not found"}, status=404)
@@ -47,6 +69,20 @@ class ResponderAPIViewSet(BaseAPIViewSet):
     name = "panic-responders"
     model = Responder
     serializer_class = ResponderSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def authenticate_user(self, request) -> bool:
+        """Authenticate request using JWT token."""
+        authenticator = JWTAuthentication()
+        try:
+            user_auth = authenticator.authenticate(request)
+            if user_auth is None:
+                return False
+            request.user, _ = user_auth
+            return True
+        except Exception:
+            return False
 
     def get_queryset(self):
         queryset = Responder.objects.filter(is_active=True)
@@ -56,12 +92,18 @@ class ResponderAPIViewSet(BaseAPIViewSet):
         return queryset.order_by("full_name")
 
     def listing_view(self, request):
+        if not self.authenticate_user(request):
+            return JsonResponse({"detail": "Authentication credentials were not provided."}, status=401)
+        
         self.request = request
         queryset = self.get_queryset()
         items = [self.serializer_class(instance).data for instance in queryset]
         return JsonResponse({"meta": {"total_count": len(items)}, "items": items})
 
     def detail_view(self, request, pk):
+        if not self.authenticate_user(request):
+            return JsonResponse({"detail": "Authentication credentials were not provided."}, status=401)
+            
         responder = Responder.objects.filter(pk=pk, is_active=True).first()
         if not responder:
             return JsonResponse({"detail": "not found"}, status=404)
@@ -72,6 +114,8 @@ class PatrolAlertAPIViewSet(BaseAPIViewSet):
     name = "panic-alerts"
     model = PatrolAlert
     serializer_class = PatrolAlertSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = PatrolAlert.objects.select_related("waypoint").order_by("-created_at")

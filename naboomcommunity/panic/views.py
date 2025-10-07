@@ -17,6 +17,7 @@ from .models import (
     InboundMessage,
     OutboundMessage,
     PatrolAlert,
+    Responder,
 )
 from .security import verify_clickatell_signature
 
@@ -276,5 +277,27 @@ def list_patrol_alerts(request: HttpRequest) -> JsonResponse:
     
     return JsonResponse({
         "meta": {"total_count": queryset.count()},
+        "items": items
+    })
+
+
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def list_responders(request: HttpRequest) -> JsonResponse:
+    """List active responders with optional filtering by province."""
+    from .serializers import ResponderSerializer
+    
+    queryset = Responder.objects.filter(is_active=True).order_by("full_name")
+    
+    # Filter by province if provided
+    province = request.GET.get("province")
+    if province:
+        queryset = queryset.filter(province=province)
+    
+    responders = queryset
+    items = [ResponderSerializer(responder).data for responder in responders]
+    
+    return JsonResponse({
+        "meta": {"total_count": len(items)},
         "items": items
     })

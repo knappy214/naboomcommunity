@@ -39,6 +39,42 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # For Vue development
 ]
 
+# CORS Configuration for authentication
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Set to True only for development
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'x-csrftoken',
+]
+
+# Override MIDDLEWARE to add Wagtail API v2 CORS support
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "panic.wagtail_cors_middleware.WagtailAPICorsMiddleware",  # Handle CORS for Wagtail API v2
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "panic.middleware.VehiclePingRateLimitMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "home.middleware.CSPMiddleware",  # Re-enabled to fix CSP image loading issues
+]
+
 try:
     from .local import *
 except ImportError:
