@@ -1,0 +1,90 @@
+upstream app_gunicorn {
+    least_conn;
+    server 127.0.0.1:8001;
+    server 127.0.0.1:8002;
+    server 127.0.0.1:8003;
+    keepalive 64;
+}
+upstream app_daphne {
+    least_conn;
+    server 127.0.0.1:9000;
+    server 127.0.0.1:9001;
+    server 127.0.0.1:9002;
+    keepalive 64;
+}
+upstream mqtt_ws {
+    server 127.0.0.1:8083;
+    keepalive 32;
+}
+
+server {
+    listen 443 ssl http2;
+    listen 443 quic reuseport;
+    server_name naboomneighbornet.net.za;
+
+    # TLS (HTTP/3 requires TLS1.3)
+    ssl_certificate     /etc/letsencrypt/live/naboomneighbornet.net.za/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/naboomneighbornet.net.za/privkey.pem;
+
+    # OCSP stapling: Let’s Encrypt requires a trusted chain
+    ssl_trusted_certificate /etc/letsencrypt/live/naboomneighbornet.net.za/chain.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 1.1.1.1 1.0.0.1 valid=300s;
+    resolver_timeout 5s;
+
+    add_header Alt-Svc 'h3=":443"; ma=86400' always;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+
+    location /static/ {
+        alias /var/www/naboomcommunity/static/;
+        access_log off;
+        expires 30d;
+        etag on;
+    }
+    location /media/ {
+        alias /var/www/naboomcommunity/media/;
+        access_log off;
+        expires 7d;
+        etag on;
+    }
+
+    location / {
+        include snippets/proxy-common.conf;
+        proxy_pass http://app_gunicorn;
+    }
+    location /api/ {
+        include snippets/proxy-common.conf;
+        proxy_pass http://app_gunicorn;
+    }
+
+    # WebSockets (Daphne)
+    location /ws/ {
+        include snippets/proxy-common.conf;
+        proxy_pass http://app_daphne;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;
+    }
+
+    # MQTT over WebSockets (Mosquitto)
+    location /mqtt {
+        include snippets/proxy-common.conf;
+        proxy_pass http://mqtt_ws;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;
+    }
+
+    location = /health {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 'OK\n';
+    }
+}
