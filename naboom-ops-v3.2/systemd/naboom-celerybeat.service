@@ -1,0 +1,25 @@
+[Unit]
+Description=Naboom Celery Beat
+After=naboom-celery.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+EnvironmentFile=-/etc/default/naboom
+WorkingDirectory=/var/www/naboomcommunity/naboomcommunity
+ExecStart=/usr/bin/env celery -A naboomcommunity beat --loglevel INFO --schedule /var/lib/celery/celerybeat-schedule
+Restart=always
+RestartSec=3
+TimeoutStartSec=60
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/naboomcommunity /var/log/naboom /var/lib/celery
+LimitNOFILE=65536
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
