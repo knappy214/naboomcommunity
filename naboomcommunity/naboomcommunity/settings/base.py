@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+SECRET_KEY = os.getenv('SECRET_KEY', '41&%i24=a^!me4_lmd1%n3t-ixis&z%)ml&yx_60k6_n9^ylhi')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -116,6 +116,7 @@ if importlib.util.find_spec("psycopg2") or importlib.util.find_spec("psycopg"):
 INSTALLED_APPS += [
     "wagtail.api.v2",
     "drf_spectacular",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [

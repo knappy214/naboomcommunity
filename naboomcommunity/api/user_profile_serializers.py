@@ -1,7 +1,17 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from home.models import UserProfile, UserGroup, UserRole, UserGroupMembership
-from wagtail.images.api.v2.serializers import ImageSerializer
+from wagtail.images.api.v2.serializers import ImageSerializer as WagtailImageSerializer
+from wagtail.images.models import Image
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    """Custom ImageSerializer with Meta class for drf_spectacular compatibility."""
+    download_url = serializers.CharField(source='file.url', read_only=True)
+    
+    class Meta:
+        model = Image
+        fields = ['id', 'title', 'file', 'width', 'height', 'download_url']
 
 User = get_user_model()
 

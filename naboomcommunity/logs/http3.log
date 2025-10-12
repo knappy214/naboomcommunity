@@ -1,0 +1,714 @@
+ERROR 2025-10-12 15:13:47,543 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 1
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:13:47,553 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 2
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:13:47,561 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 3
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:13:47,568 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 4
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:13:47,581 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 5
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:13:47,590 wagtail_update_image_renditions 1702909 126128633688192 Error operating on rendition 6
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 16, in cached_import
+    return getattr(module, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'redis.connection' has no attribute 'HiredisParser'. Did you mean: '_HiredisParser'?
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 422, in delete
+    client = self.get_client(write=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 128, in get_client
+    self._clients[index] = self.connect(index)
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 157, in connect
+    return self.connection_factory.connect(self._server[index])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 69, in connect
+    params = self.make_connection_params(url)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 41, in make_connection_params
+    "parser_class": self.get_parser_cls(),
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/pool.py", line 97, in get_parser_cls
+    return import_string(cls)
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/utils/module_loading.py", line 32, in import_string
+    raise ImportError(
+ImportError: Module "redis.connection" does not define a "HiredisParser" attribute/class
+ERROR 2025-10-12 15:19:58,377 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 1
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.
+ERROR 2025-10-12 15:19:58,391 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 2
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.
+ERROR 2025-10-12 15:19:58,397 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 3
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.
+ERROR 2025-10-12 15:19:58,402 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 4
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.
+ERROR 2025-10-12 15:19:58,408 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 5
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.
+ERROR 2025-10-12 15:19:58,414 wagtail_update_image_renditions 1708026 123985274806400 Error operating on rendition 6
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 29, in _decorator
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 104, in delete
+    result = self.client.delete(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 427, in delete
+    raise ConnectionInterrupted(connection=client) from e
+django_redis.exceptions.ConnectionInterrupted: Redis AuthenticationError: invalid username-password pair or user is disabled.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/management/commands/wagtail_update_image_renditions.py", line 77, in handle
+    rendition.delete()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1281, in delete
+    return collector.delete()
+           ^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/db/models/deletion.py", line 507, in delete
+    signals.post_delete.send(
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/signal_handlers.py", line 20, in post_delete_purge_rendition_cache
+    instance.purge_from_cache()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/wagtail/images/models.py", line 1527, in purge_from_cache
+    self.cache_backend.delete(self.get_cache_key())
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/cache.py", line 36, in _decorator
+    raise e.__cause__  # noqa: B904
+    ^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/django_redis/client/default.py", line 425, in delete
+    return client.delete(self.make_key(key, version=version, prefix=prefix))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/commands/core.py", line 1712, in delete
+    return self.execute_command("DEL", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 403, in connect_check_health
+    self.on_connect_check_health(check_health=check_health)
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 475, in on_connect_check_health
+    auth_response = self.read_response()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/connection.py", line 650, in read_response
+    response = self._parser.read_response(disable_decoding=disable_decoding)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 15, in read_response
+    result = self._read_response(disable_decoding=disable_decoding)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/www/naboomcommunity/venv/lib/python3.12/site-packages/redis/_parsers/resp2.py", line 38, in _read_response
+    raise error
+redis.exceptions.AuthenticationError: invalid username-password pair or user is disabled.

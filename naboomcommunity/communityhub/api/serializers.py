@@ -5,6 +5,8 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from wagtail.models import Locale
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 from ..models import (
     AuditLog,
@@ -21,12 +23,13 @@ from ..models import (
 )
 
 
-class TranslationField(serializers.Field):
+class TranslationField(serializers.DictField):
     """Expose available translations for a translatable model field."""
 
     def __init__(self, field_name: str, **kwargs):
         self._field_name = field_name
         kwargs.setdefault("source", "*")
+        kwargs.setdefault("child", serializers.CharField())
         super().__init__(**kwargs)
 
     def to_representation(self, value):  # type: ignore[override]
@@ -55,9 +58,7 @@ class TranslationField(serializers.Field):
 class ChannelSerializer(serializers.ModelSerializer):
     name_translations = TranslationField("name")
     description_translations = TranslationField("description")
-    is_member = serializers.SerializerMethodField()
-    membership_role = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = Channel
         fields = [
@@ -82,6 +83,9 @@ class ChannelSerializer(serializers.ModelSerializer):
             "is_member",
             "membership_role",
         ]
+    
+    is_member = serializers.SerializerMethodField()
+    membership_role = serializers.SerializerMethodField()
 
     def get_is_member(self, obj: Channel) -> bool:
         request = self.context.get("request")

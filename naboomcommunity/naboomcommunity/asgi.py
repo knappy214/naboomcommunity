@@ -7,8 +7,13 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "naboomcommunity.settings.dev")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "naboomcommunity.settings.production")
 
+# Initialize Django ASGI application early to ensure the AppRegistry is populated
+# This must be done before importing anything that touches models
+django_asgi_app = get_asgi_application()
+
+# Now we can safely import routing
 try:
     from .routing import websocket_urlpatterns
 except ImportError:  # pragma: no cover - routing optional during bootstrap
@@ -16,7 +21,7 @@ except ImportError:  # pragma: no cover - routing optional during bootstrap
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": django_asgi_app,
         "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
     }
 )

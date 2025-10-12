@@ -258,7 +258,10 @@ def create_default_groups_and_roles():
         if created:
             print(f"Created group: {group_name}")
     
-    return created_roles, created_groups
+    return {
+        'roles': created_roles,
+        'groups': created_groups
+    }
 
 
 def assign_user_to_default_group(user: User):
