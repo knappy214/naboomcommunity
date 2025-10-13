@@ -31,7 +31,41 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Community-First Platform Compliance
+- [ ] Feature prioritizes resident safety and emergency response capabilities
+- [ ] Development decision evaluated against community safety impact
+- [ ] Emergency features take priority over non-essential functionality
+
+### Accessibility-First Design Compliance
+- [ ] Interface follows WCAG guidelines for all community members
+- [ ] Design accommodates basic smartphones with poor connectivity
+- [ ] Minimal learning curve for non-technical users
+- [ ] Mobile-first approach implemented
+
+### Privacy-First Data Protection Compliance
+- [ ] Zero-tolerance privacy policy for personal and emergency data
+- [ ] Data collection is minimal, purposeful, and transparent
+- [ ] GDPR compliance verified
+
+### Offline-Capable Emergency Features Compliance
+- [ ] Critical emergency features function during load shedding scenarios
+- [ ] Panic button functionality works offline
+- [ ] Local data caching and sync capabilities implemented
+
+### Multilingual Support Compliance
+- [ ] English and Afrikaans support implemented
+- [ ] Language preferences respected throughout platform
+- [ ] Future language additions don't compromise existing functionality
+
+### User-Driven Feature Development Compliance
+- [ ] Feature based on actual community needs, not technical possibilities
+- [ ] Community feedback drives development priorities
+- [ ] Technical complexity justified by clear community benefit
+
+### Sustainable Technology Choices Compliance
+- [ ] Technology maintainable by small development teams
+- [ ] No vendor lock-in dependencies
+- [ ] Open-source solutions preferred where possible
 
 ## Project Structure
 

@@ -90,6 +90,38 @@
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+### Community Safety Requirements
+
+- **CSR-001**: System MUST prioritize emergency response capabilities above all other features
+- **CSR-002**: Panic button functionality MUST work offline during load shedding scenarios
+- **CSR-003**: Emergency contacts MUST be accessible without internet connectivity
+- **CSR-004**: System MUST support real-time incident tracking and responder coordination
+- **CSR-005**: Medical information MUST be encrypted and accessible to emergency responders
+
+### Accessibility Requirements
+
+- **AR-001**: Interface MUST comply with WCAG 2.1 AA guidelines
+- **AR-002**: System MUST support basic smartphones with poor connectivity
+- **AR-003**: Design MUST accommodate elderly and disabled community members
+- **AR-004**: Interface MUST have minimal learning curve for non-technical users
+- **AR-005**: System MUST support assistive technologies
+
+### Multilingual Requirements
+
+- **MLR-001**: System MUST support English and Afrikaans as standard languages
+- **MLR-002**: Language preferences MUST be respected throughout the platform
+- **MLR-003**: Emergency communications MUST be available in both languages
+- **MLR-004**: All user interfaces MUST be translatable
+- **MLR-005**: Language switching MUST not compromise functionality
+
+### Privacy Requirements
+
+- **PR-001**: System MUST implement zero-tolerance privacy policy
+- **PR-002**: Personal and emergency data MUST be encrypted end-to-end
+- **PR-003**: Data collection MUST be minimal, purposeful, and transparent
+- **PR-004**: System MUST comply with GDPR requirements
+- **PR-005**: Users MUST have control over their data sharing preferences
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
