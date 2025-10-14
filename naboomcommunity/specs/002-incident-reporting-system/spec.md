@@ -392,27 +392,27 @@ class IncidentCategorySnippet(TranslatableMixin, ClusterableModel):
 ### API Endpoints
 
 #### Incident Management API
-- `GET /api/v2/incidents/` - List incidents with filtering and pagination
-- `POST /api/v2/incidents/` - Create new incident report
-- `GET /api/v2/incidents/{id}/` - Get incident details
-- `PUT /api/v2/incidents/{id}/` - Update incident
-- `PATCH /api/v2/incidents/{id}/status/` - Update incident status
-- `POST /api/v2/incidents/{id}/assign/` - Assign incident to responder
-- `POST /api/v2/incidents/{id}/escalate/` - Escalate to local authorities
+- `GET /incidents/api/incidents/` - List incidents with filtering and pagination
+- `POST /incidents/api/incidents/` - Create new incident report
+- `GET /incidents/api/incidents/{id}/` - Get incident details
+- `PUT /incidents/api/incidents/{id}/` - Update incident
+- `PATCH /incidents/api/incidents/{id}/status/` - Update incident status
+- `POST /incidents/api/incidents/{id}/assign/` - Assign incident to responder
+- `POST /incidents/api/incidents/{id}/escalate/` - Escalate to local authorities
 
 #### Media Management API
-- `POST /api/v2/incidents/{id}/media/` - Upload media files
-- `GET /api/v2/incidents/{id}/media/` - List incident media
-- `DELETE /api/v2/incidents/{id}/media/{media_id}/` - Delete media file
+- `POST /incidents/api/incidents/{id}/media/` - Upload media files
+- `GET /incidents/api/incidents/{id}/media/` - List incident media
+- `DELETE /incidents/api/incidents/{id}/media/{media_id}/` - Delete media file
 
 #### Real-Time Updates API
 - `WS /ws/incidents/` - WebSocket connection for real-time updates
-- `POST /api/v2/incidents/broadcast/` - Broadcast updates to connected clients
+- `POST /incidents/api/incidents/broadcast/` - Broadcast updates to connected clients
 
 #### Local Authority Integration API
-- `POST /api/v2/incidents/{id}/forward/` - Forward incident to local authority
-- `GET /api/v2/incidents/{id}/authority-status/` - Get local authority status
-- `POST /api/v2/incidents/authority-callback/` - Receive authority updates
+- `POST /incidents/api/incidents/{id}/forward/` - Forward incident to local authority
+- `GET /incidents/api/incidents/{id}/authority-status/` - Get local authority status
+- `POST /incidents/api/incidents/authority-callback/` - Receive authority updates
 
 ### MinIO Integration
 

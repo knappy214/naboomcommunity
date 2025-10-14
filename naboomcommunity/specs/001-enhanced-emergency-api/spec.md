@@ -66,7 +66,7 @@ Family members and emergency contacts receive immediate notifications about thei
 
 **Acceptance Scenarios**:
 
-1. **Given** a user has configured emergency contacts, **When** they activate the panic button, **Then** all active emergency contacts receive SMS and push notifications within 10 seconds
+1. **Given** a user has configured emergency contacts, **When** they activate the panic button, **Then** all active emergency contacts receive SMS and push notifications within 5 seconds
 2. **Given** family members receive emergency notifications, **When** they respond to the notification, **Then** their response is logged and shared with emergency responders
 3. **Given** emergency contacts have different communication preferences, **When** notifications are sent, **Then** each contact receives notifications via their preferred method (SMS, email, push)
 
@@ -88,13 +88,13 @@ The system integrates with external emergency services (police, medical, fire) t
 
 ---
 
-### Edge Cases
+### Error Handling Requirements
 
-- What happens when GPS location is unavailable or inaccurate?
-- How does the system handle multiple panic button activations from the same user within a short timeframe?
-- What occurs when emergency contacts are unreachable or have invalid phone numbers?
-- How does the system handle WebSocket connection drops during critical updates?
-- What happens when external emergency services are unavailable or return errors?
+- **EH-001**: When GPS location is unavailable, system MUST use last known location with accuracy flag and attempt network-based location
+- **EH-002**: Multiple panic button activations within 5 minutes MUST be treated as single incident with updated timestamp and priority escalation
+- **EH-003**: Unreachable emergency contacts MUST trigger fallback notification methods and log delivery failures for retry
+- **EH-004**: WebSocket connection drops MUST trigger automatic reconnection with message queuing and delivery confirmation
+- **EH-005**: External emergency service failures MUST trigger retry logic with exponential backoff and fallback to alternative services
 
 ## Requirements *(mandatory)*
 
@@ -117,7 +117,7 @@ The system integrates with external emergency services (police, medical, fire) t
 ### Accessibility Requirements
 
 - **AR-001**: Interface MUST comply with WCAG 2.1 AA guidelines
-- **AR-002**: System MUST support basic smartphones with poor connectivity
+- **AR-002**: System MUST support smartphones with minimum Android 7.0/iOS 12.0, 2GB RAM, and 3G connectivity (minimum 1Mbps)
 - **AR-003**: Design MUST accommodate elderly and disabled community members
 - **AR-004**: Interface MUST have minimal learning curve for non-technical users
 - **AR-005**: System MUST support assistive technologies
@@ -148,7 +148,7 @@ The system integrates with external emergency services (police, medical, fire) t
 
 ### Security Requirements
 
-- **SR-001**: System MUST implement proper authentication for all emergency endpoints
+- **SR-001**: System MUST implement JWT-based authentication for all emergency endpoints with 1-hour token expiry
 - **SR-002**: Medical data MUST be encrypted at rest and in transit
 - **SR-003**: System MUST implement rate limiting to prevent panic button abuse
 - **SR-004**: All emergency communications MUST be logged for audit purposes
@@ -208,21 +208,21 @@ The system integrates with external emergency services (police, medical, fire) t
 ### API Endpoints
 
 #### Enhanced Panic Button API
-- `POST /panic/api/v2/emergency/activate/` - Enhanced panic button activation with medical data
-- `GET /panic/api/v2/emergency/status/<incident_id>/` - Real-time incident status
-- `POST /panic/api/v2/emergency/offline-sync/` - Offline incident synchronization
-- `GET /panic/api/v2/emergency/medical/<user_id>/` - Retrieve medical information
-- `POST /panic/api/v2/emergency/notify-family/` - Family notification system
+- `POST /panic/api/emergency/activate/` - Enhanced panic button activation with medical data
+- `GET /panic/api/emergency/status/<incident_id>/` - Real-time incident status
+- `POST /panic/api/emergency/offline-sync/` - Offline incident synchronization
+- `GET /panic/api/emergency/medical/<user_id>/` - Retrieve medical information
+- `POST /panic/api/emergency/notify-family/` - Family notification system
 
 #### Real-Time Updates API
 - `WS /panic/ws/emergency/` - WebSocket connection for real-time updates
-- `POST /panic/api/v2/emergency/broadcast/` - Broadcast updates to connected clients
-- `GET /panic/api/v2/emergency/subscriptions/` - Manage client subscriptions
+- `POST /panic/api/emergency/broadcast/` - Broadcast updates to connected clients
+- `GET /panic/api/emergency/subscriptions/` - Manage client subscriptions
 
 #### External Integration API
-- `POST /panic/api/v2/external/dispatch/` - Dispatch to external emergency services
-- `GET /panic/api/v2/external/status/<service>/` - Check external service status
-- `POST /panic/api/v2/external/callback/` - External service callback handler
+- `POST /panic/api/external/dispatch/` - Dispatch to external emergency services
+- `GET /panic/api/external/status/<service>/` - Check external service status
+- `POST /panic/api/external/callback/` - External service callback handler
 
 ### Database Schema Extensions
 
