@@ -13,6 +13,13 @@ from . import (
     views_waypoints,
     security_views,
 )
+from .api import (
+    enhanced_views,
+    websocket_views,
+    offline_views,
+    family_views,
+    integration_views,
+)
 
 urlpatterns = [
     # Primary URLs with trailing slashes (recommended)
@@ -33,6 +40,16 @@ urlpatterns = [
     path("webhooks/clickatell/inbound/", views.clickatell_inbound, name="panic_clickatell_inbound"),
     path("webhooks/clickatell/status/", views.clickatell_status, name="panic_clickatell_status"),
     path("ussd/handle/", views_ussd.ussd_handle, name="panic_ussd_handle"),
+    
+    # Enhanced Emergency Response API endpoints
+    path("api/enhanced/panic/", enhanced_views.enhanced_panic_button, name="enhanced_panic_button"),
+    path("api/websocket/status/", websocket_views.websocket_status, name="websocket_status"),
+    path("api/offline/panic/", offline_views.offline_panic_button, name="offline_panic_button"),
+    path("api/offline/sync/", offline_views.sync_offline_data, name="offline_sync"),
+    path("api/family/notify/", family_views.send_family_notification, name="family_notify"),
+    path("api/family/contacts/", family_views.get_emergency_contacts, name="family_contacts"),
+    path("api/integration/dispatch/", integration_views.dispatch_emergency_service, name="dispatch_service"),
+    path("api/integration/status/<str:dispatch_id>/", integration_views.get_service_status, name="service_status"),
     
     # Backward compatibility URLs without trailing slashes (for existing clients)
     path("api/submit", views.submit_incident, name="panic_submit_no_slash"),

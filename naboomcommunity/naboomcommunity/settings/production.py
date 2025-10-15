@@ -69,6 +69,10 @@ redis_users = {
     'WEBSOCKET_PASSWORD': {'user': 'websocket_user', 'password': 'QnBEWsaYvDNOnihFW/sWChAZ81MZc2eM'},
     'REALTIME_PASSWORD': {'user': 'realtime_user', 'password': 'LvxG45/ArFSZVOOrWfzQoYbc+Jc8lB2Z'},
     'MONITORING_PASSWORD': {'user': 'monitoring_user', 'password': 'cYzwdiPoN4taA1jBwFJZqhbQAuUR1ykb'},
+    # Emergency Response Redis Users (Databases 8, 9, 10)
+    'EMERGENCY_DB8_PASSWORD': {'user': 'emergency_db8_user', 'password': 'YkdcugPLQyHZw+8P7ElFG9a/nroiKWwY'},
+    'EMERGENCY_DB9_PASSWORD': {'user': 'emergency_db9_user', 'password': 'QnBEWsaYvDNOnihFW/sWChAZ81MZc2eM'},
+    'EMERGENCY_DB10_PASSWORD': {'user': 'emergency_db10_user', 'password': 'LvxG45/ArFSZVOOrWfzQoYbc+Jc8lB2Z'},
 }
 
 # Redis caching with HTTP/3 optimizations
@@ -157,6 +161,32 @@ CELERY_TASK_ROUTES = {
         'queue': 'community-tasks',
         'routing_key': 'community.task',
         'priority': 3,
+    },
+    # Emergency Response Task Routing
+    'panic.tasks.emergency_*': {
+        'queue': 'emergency-high-priority',
+        'routing_key': 'emergency.high',
+        'priority': 10,
+    },
+    'panic.tasks.location_*': {
+        'queue': 'emergency-location',
+        'routing_key': 'emergency.location',
+        'priority': 8,
+    },
+    'panic.tasks.medical_*': {
+        'queue': 'emergency-medical',
+        'routing_key': 'emergency.medical',
+        'priority': 9,
+    },
+    'panic.tasks.notification_*': {
+        'queue': 'emergency-notifications',
+        'routing_key': 'emergency.notification',
+        'priority': 7,
+    },
+    'panic.tasks.sync_*': {
+        'queue': 'emergency-sync',
+        'routing_key': 'emergency.sync',
+        'priority': 6,
     },
 }
 
@@ -354,6 +384,35 @@ MIDDLEWARE = [
 
 WAGTAIL_SITE_NAME = "Naboom Community"
 WAGTAILADMIN_BASE_URL = "https://naboomneighbornet.net.za"
+
+# ============================================================================
+# EMERGENCY STORAGE CONFIGURATION
+# ============================================================================
+
+# Emergency-specific MinIO storage configuration
+EMERGENCY_STORAGE_BUCKET_NAME = os.getenv('EMERGENCY_STORAGE_BUCKET_NAME', 'naboom-emergency-media')
+EMERGENCY_STORAGE_ENDPOINT_URL = os.getenv('EMERGENCY_STORAGE_ENDPOINT_URL', 'https://s3.naboomneighbornet.net.za')
+EMERGENCY_STORAGE_CUSTOM_DOMAIN = os.getenv('EMERGENCY_STORAGE_CUSTOM_DOMAIN', 's3.naboomneighbornet.net.za')
+
+# Emergency storage settings
+EMERGENCY_STORAGE_SETTINGS = {
+    'AWS_ACCESS_KEY_ID': os.getenv('AWS_ACCESS_KEY_ID', 'immunothreat'),
+    'AWS_SECRET_ACCESS_KEY': os.getenv('AWS_SECRET_ACCESS_KEY', 'INikbgTflu34yWjJHZYi'),
+    'AWS_STORAGE_BUCKET_NAME': EMERGENCY_STORAGE_BUCKET_NAME,
+    'AWS_S3_ENDPOINT_URL': EMERGENCY_STORAGE_ENDPOINT_URL,
+    'AWS_S3_CUSTOM_DOMAIN': EMERGENCY_STORAGE_CUSTOM_DOMAIN,
+    'AWS_DEFAULT_ACL': 'private',  # Emergency files should be private
+    'AWS_S3_FILE_OVERWRITE': False,
+    'AWS_QUERYSTRING_AUTH': True,  # Use signed URLs for security
+    'AWS_S3_REGION_NAME': os.getenv('AWS_S3_REGION_NAME', 'us-east-1'),
+    'AWS_S3_OBJECT_PARAMETERS': {
+        'CacheControl': 'max-age=3600',  # 1 hour cache for emergency files
+        'ContentDisposition': 'attachment',  # Force download for security
+    },
+}
+
+# Emergency media URL configuration
+EMERGENCY_MEDIA_URL = f"{EMERGENCY_STORAGE_ENDPOINT_URL}/{EMERGENCY_STORAGE_BUCKET_NAME}/emergency/"
 
 # ============================================================================
 # FINAL CONFIGURATION
