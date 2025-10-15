@@ -108,7 +108,102 @@ CACHES = {
         'KEY_PREFIX': 'naboom',
         'TIMEOUT': 300,
         'VERSION': 1,
-    }
+    },
+    # Emergency Response Caching - Database 8
+    'emergency_location': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_users["EMERGENCY_DB8_PASSWORD"]["user"]}:{quote_plus(redis_users["EMERGENCY_DB8_PASSWORD"]["password"])}@127.0.0.1:6379/8',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 100,  # High concurrency for location data
+                'retry_on_timeout': True,
+                'socket_keepalive': True,
+                'socket_keepalive_options': {},
+            },
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
+        },
+        'KEY_PREFIX': 'emergency_location',
+        'TIMEOUT': 60,  # Short timeout for real-time location data
+        'VERSION': 1,
+    },
+    # Emergency Medical Data Caching - Database 9
+    'emergency_medical': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_users["EMERGENCY_DB9_PASSWORD"]["user"]}:{quote_plus(redis_users["EMERGENCY_DB9_PASSWORD"]["password"])}@127.0.0.1:6379/9',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 50,  # Moderate concurrency for medical data
+                'retry_on_timeout': True,
+                'socket_keepalive': True,
+                'socket_keepalive_options': {},
+            },
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
+        },
+        'KEY_PREFIX': 'emergency_medical',
+        'TIMEOUT': 3600,  # Longer timeout for medical data
+        'VERSION': 1,
+    },
+    # Emergency Notifications Caching - Database 10
+    'emergency_notifications': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_users["EMERGENCY_DB10_PASSWORD"]["user"]}:{quote_plus(redis_users["EMERGENCY_DB10_PASSWORD"]["password"])}@127.0.0.1:6379/10',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 75,  # High concurrency for notifications
+                'retry_on_timeout': True,
+                'socket_keepalive': True,
+                'socket_keepalive_options': {},
+            },
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
+        },
+        'KEY_PREFIX': 'emergency_notifications',
+        'TIMEOUT': 1800,  # Medium timeout for notification data
+        'VERSION': 1,
+    },
+    # Emergency Rate Limiting Cache
+    'emergency_rate_limit': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_users["EMERGENCY_DB8_PASSWORD"]["user"]}:{quote_plus(redis_users["EMERGENCY_DB8_PASSWORD"]["password"])}@127.0.0.1:6379/8',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 200,  # Very high concurrency for rate limiting
+                'retry_on_timeout': True,
+                'socket_keepalive': True,
+                'socket_keepalive_options': {},
+            },
+            'COMPRESSOR': None,  # No compression for rate limiting data
+            'SERIALIZER': 'django_redis.serializers.pickle.PickleSerializer',
+        },
+        'KEY_PREFIX': 'emergency_rate_limit',
+        'TIMEOUT': 300,  # Short timeout for rate limiting data
+        'VERSION': 1,
+    },
+    # Emergency WebSocket Cache
+    'emergency_websocket': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_users["EMERGENCY_DB9_PASSWORD"]["user"]}:{quote_plus(redis_users["EMERGENCY_DB9_PASSWORD"]["password"])}@127.0.0.1:6379/9',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 150,  # High concurrency for WebSocket data
+                'retry_on_timeout': True,
+                'socket_keepalive': True,
+                'socket_keepalive_options': {},
+            },
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
+        },
+        'KEY_PREFIX': 'emergency_websocket',
+        'TIMEOUT': 30,  # Very short timeout for WebSocket data
+        'VERSION': 1,
+    },
 }
 
 # ============================================================================
