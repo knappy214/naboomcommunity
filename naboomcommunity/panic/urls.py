@@ -43,6 +43,12 @@ urlpatterns = [
     
     # Enhanced Emergency Response API endpoints
     path("api/enhanced/panic/", enhanced_views.enhanced_panic_button, name="enhanced_panic_button"),
+    path("api/enhanced/location/validate/", enhanced_views.location_accuracy_validation, name="location_accuracy_validation"),
+    path("api/enhanced/location/batch/", enhanced_views.location_batch_accuracy, name="location_batch_accuracy"),
+    path("api/enhanced/medical/", enhanced_views.medical_data, name="medical_data"),
+    path("api/enhanced/notify/", enhanced_views.send_emergency_notification, name="send_emergency_notification"),
+    path("api/enhanced/status/<str:emergency_id>/", enhanced_views.emergency_status, name="emergency_status"),
+    path("api/enhanced/status/<str:emergency_id>/update/", enhanced_views.update_emergency_status, name="update_emergency_status"),
     path("api/websocket/status/", websocket_views.websocket_status, name="websocket_status"),
     path("api/offline/panic/", offline_views.offline_panic_button, name="offline_panic_button"),
     path("api/offline/sync/", offline_views.sync_offline_data, name="offline_sync"),
