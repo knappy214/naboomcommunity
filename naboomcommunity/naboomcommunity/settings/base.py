@@ -594,6 +594,27 @@ COMMUNITY_ALERT_DUPLICATE_THRESHOLD = float(
     os.getenv("COMMUNITY_ALERT_DUPLICATE_THRESHOLD", "0.7")
 )
 
+# ============================================================================
+# MQTT CONFIGURATION
+# ============================================================================
+
+# MQTT Broker Settings (with authentication)
+MQTT_HOST = os.getenv('MQTT_HOST', 'localhost')
+MQTT_PORT = int(os.getenv('MQTT_PORT', '1883'))
+MQTT_SSL_PORT = int(os.getenv('MQTT_SSL_PORT', '8883'))
+MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'naboom-mqtt')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', 'NaboomMQTT2024!')
+MQTT_CLIENT_ID = os.getenv('MQTT_CLIENT_ID', 'naboom-community')
+MQTT_KEEPALIVE = int(os.getenv('MQTT_KEEPALIVE', '60'))
+MQTT_USE_SSL = os.getenv('MQTT_USE_SSL', 'false').lower() in ('true', '1', 'yes')
+
+# MQTT Topic Configuration
+MQTT_TOPIC_PREFIX = 'naboom'
+MQTT_COMMUNITY_TOPIC = f'{MQTT_TOPIC_PREFIX}/community'
+MQTT_SYSTEM_TOPIC = f'{MQTT_TOPIC_PREFIX}/system'
+MQTT_NOTIFICATION_TOPIC = f'{MQTT_TOPIC_PREFIX}/notifications'
+MQTT_ALERT_TOPIC = f'{MQTT_TOPIC_PREFIX}/alerts'
+
 # Django Channels configuration (optimized for performance)
 CHANNEL_LAYERS = {
     "default": {
