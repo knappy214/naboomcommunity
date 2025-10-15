@@ -36,10 +36,6 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
-            'MAX_CONNS': 20,  # HTTP/3 optimized connection pool
-            'MIN_CONNS': 5,
-            'CONN_MAX_AGE': 600,  # 10 minutes
-            'CONN_HEALTH_CHECKS': True,
         },
     }
 }
@@ -165,6 +161,7 @@ CONN_MAX_AGE = 600  # 10 minutes
 CONN_HEALTH_CHECKS = True
 
 # Template optimizations for HTTP/3
+TEMPLATES[0]['APP_DIRS'] = False  # Disable APP_DIRS when using custom loaders
 TEMPLATES[0]['OPTIONS']['loaders'] = [
     ('django.template.loaders.cached.Loader', [
         'django.template.loaders.filesystem.Loader',
@@ -185,6 +182,7 @@ SESSION_SAVE_EVERY_REQUEST = False
 # LOGGING CONFIGURATION
 # ============================================================================
 
+# Simplified logging configuration to avoid file permission issues with Celery
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -199,14 +197,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/naboom/django.log',
-            'maxBytes': 1024*1024*15,  # 15MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -214,22 +204,32 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['file', 'console'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'naboomcommunity': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'communityhub': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery.task': {
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
