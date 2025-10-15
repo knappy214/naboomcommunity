@@ -4,7 +4,7 @@ URL routing for emergency response WebSocket connections.
 """
 
 from django.urls import re_path
-from . import consumers
+from . import emergency_consumers as consumers
 from . import location_consumers
 
 # Emergency WebSocket URL patterns
@@ -14,12 +14,12 @@ websocket_urlpatterns = [
     re_path(r'^ws/emergency/$', consumers.EmergencyConsumer.as_asgi()),
     
     # Location tracking and updates
-    re_path(r'^ws/location/(?P<user_id>[0-9a-f-]+)/$', location_consumers.LocationConsumer.as_asgi()),
-    re_path(r'^ws/location/$', location_consumers.LocationConsumer.as_asgi()),
+    re_path(r'^ws/location/(?P<user_id>[0-9a-f-]+)/$', consumers.LocationConsumer.as_asgi()),
+    re_path(r'^ws/location/$', consumers.LocationConsumer.as_asgi()),
     
     # Medical information updates
-    re_path(r'^ws/medical/(?P<user_id>[0-9a-f-]+)/$', location_consumers.MedicalConsumer.as_asgi()),
-    re_path(r'^ws/medical/$', location_consumers.MedicalConsumer.as_asgi()),
+    re_path(r'^ws/medical/(?P<user_id>[0-9a-f-]+)/$', consumers.MedicalConsumer.as_asgi()),
+    re_path(r'^ws/medical/$', consumers.MedicalConsumer.as_asgi()),
     
     # Family notifications
     re_path(r'^ws/family/(?P<user_id>[0-9a-f-]+)/$', location_consumers.FamilyConsumer.as_asgi()),
