@@ -26,6 +26,7 @@ from .user_profile_views import (
     user_profile_stats,
 )
 from .viewsets import health
+from .mqtt_health import MQTTHealthView, MQTTMetricsView
 
 router = DefaultRouter()  # no custom viewsets; pages served via Wagtail API v2
 
@@ -47,6 +48,10 @@ api_urlpatterns = [
     ),
 
     path("health/", health),
+    
+    # MQTT Health and Monitoring endpoints
+    path("mqtt/health/", MQTTHealthView.as_view(), name="mqtt-health"),
+    path("mqtt/metrics/", MQTTMetricsView.as_view(), name="mqtt-metrics"),
 
     # User Profile endpoints
     path("user-profile/", UserProfileDetailView.as_view(), name="user-profile-detail"),

@@ -2,7 +2,7 @@
 # PYTHON 3.12.3 SPECIFIC SETTINGS
 # ============================================================================
 
-PYTHONPATH=/var/www/naboomcommunity/naboomcommunity
+PYTHONPATH=/var/www/naboomcommunity
 PYTHONUNBUFFERED=1
 PYTHONDONTWRITEBYTECODE=1
 PYTHONHASHSEED=random
@@ -113,7 +113,7 @@ CELERY_RESULT_EXPIRES=3600
 # NGINX 1.24.0 + HTTP/3 SETTINGS
 # ============================================================================
 
-NGINX_VERSION=1.29.0
+NGINX_VERSION=1.24.0
 NGINX_ENABLE_HTTP3=True
 NGINX_WORKER_PROCESSES=auto
 NGINX_WORKER_CONNECTIONS=4096

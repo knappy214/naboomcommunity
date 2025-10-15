@@ -630,3 +630,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# ============================================================================
+# ADMIN CONFIGURATION
+# ============================================================================
+
+# Admin configuration
+LOGIN_REDIRECT_URL = '/django-admin/'
+LOGIN_URL = '/django-admin/login/'
+ADMIN_URL = '/django-admin/'

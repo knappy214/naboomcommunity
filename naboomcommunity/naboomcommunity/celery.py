@@ -9,7 +9,9 @@ except ImportError:  # pragma: no cover - allow local development without Celery
     Celery = None
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "naboomcommunity.settings.dev")
+# Use environment variable if set, otherwise default to production
+if "DJANGO_SETTINGS_MODULE" not in os.environ:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "naboomcommunity.settings.production")
 
 
 if Celery is not None:

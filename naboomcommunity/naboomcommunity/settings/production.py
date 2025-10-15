@@ -41,14 +41,14 @@ DATABASES = {
         'OPTIONS': {
             'sslmode': 'require',  # Require SSL in production
             'connect_timeout': 10,
-            # Production-optimized psycopg connection pooling
-            'pool': {
-                'min_size': 10,  # Higher minimum for production load
-                'max_size': 50,  # Higher maximum for emergency response capacity
-                'timeout': 20,   # Longer timeout for production stability
-                'max_lifetime': 3600,  # Connection lifetime in seconds
-                'max_idle': 300,  # Max idle time before connection cleanup
-            },
+            # Temporarily disable connection pooling to fix Celery Beat issues
+            # 'pool': {
+            #     'min_size': 10,  # Higher minimum for production load
+            #     'max_size': 50,  # Higher maximum for emergency response capacity
+            #     'timeout': 20,   # Longer timeout for production stability
+            #     'max_lifetime': 3600,  # Connection lifetime in seconds
+            #     'max_idle': 300,  # Max idle time before connection cleanup
+            # },
             # PostgreSQL production optimizations
             'application_name': 'naboom_emergency_system_prod',
             'keepalives_idle': '600',
@@ -72,10 +72,24 @@ redis_users = {
 }
 
 # Redis caching with HTTP/3 optimizations
+# Use environment variables for Redis authentication (from systemd service)
+redis_host = os.getenv('REDIS_HOST', '127.0.0.1')
+redis_port = os.getenv('REDIS_PORT', '6379')
+redis_password = os.getenv('REDIS_PASSWORD', '')
+redis_user = os.getenv('REDIS_USER', '')
+
+# Build Redis URL with authentication from environment variables
+if redis_user and redis_password:
+    redis_url = f"redis://{redis_user}:{quote_plus(redis_password)}@{redis_host}:{redis_port}/0"
+elif redis_password:
+    redis_url = f"redis://:{quote_plus(redis_password)}@{redis_host}:{redis_port}/0"
+else:
+    redis_url = f"redis://{redis_host}:{redis_port}/0"
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{redis_users["DJANGO_APP_PASSWORD"]["user"]}:{quote_plus(redis_users["DJANGO_APP_PASSWORD"]["password"])}@127.0.0.1:6379/0',
+        'LOCATION': redis_url,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'CONNECTION_POOL_KWARGS': {
@@ -100,6 +114,11 @@ CACHES = {
 # Enhanced Celery configuration for HTTP/3 performance
 CELERY_BROKER_URL = f'redis://{redis_users["DJANGO_APP_PASSWORD"]["user"]}:{quote_plus(redis_users["DJANGO_APP_PASSWORD"]["password"])}@127.0.0.1:6379/2'
 CELERY_RESULT_BACKEND = f'redis://{redis_users["DJANGO_APP_PASSWORD"]["user"]}:{quote_plus(redis_users["DJANGO_APP_PASSWORD"]["password"])}@127.0.0.1:6379/2'
+
+# Celery Beat configuration to prevent database connection pool issues
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULE_FILENAME = '/var/run/celery/beat-schedule'
+
 
 # HTTP/3 Celery optimizations
 CELERY_ACCEPT_CONTENT = ['json']
@@ -347,3 +366,8 @@ TIME_ZONE = 'Africa/Johannesburg'
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
+
+# Admin configuration (inherits from base.py but can be overridden)
+LOGIN_REDIRECT_URL = '/django-admin/'
+LOGIN_URL = '/django-admin/login/'
+ADMIN_URL = '/django-admin/'
