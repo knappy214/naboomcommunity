@@ -230,11 +230,13 @@ DATABASES = {
         "OPTIONS": {
             "sslmode": "prefer",  # SSL mode for security
             "connect_timeout": 10,  # Connection timeout
-            # Advanced psycopg connection pooling for 30-50% faster queries
+            # Enhanced psycopg connection pooling for 30-50% faster queries
             "pool": {
-                "min_size": 5,  # Minimum connections always available
-                "max_size": 20,  # Maximum connections to prevent overload
-                "timeout": 10,  # Connection acquisition timeout
+                "min_size": 8,  # Increased minimum connections for better availability
+                "max_size": 30,  # Increased maximum connections for emergency response load
+                "timeout": 15,  # Increased timeout for high-load scenarios
+                "max_lifetime": 3600,  # Connection lifetime in seconds
+                "max_idle": 300,  # Max idle time before connection cleanup
             },
             # PostgreSQL 16 performance optimizations
             "application_name": "naboom_emergency_system",

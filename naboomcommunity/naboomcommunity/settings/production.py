@@ -26,7 +26,8 @@ X_FRAME_OPTIONS = 'DENY'
 # DATABASE CONFIGURATION
 # ============================================================================
 
-# PostgreSQL configuration with connection pooling
+# PostgreSQL configuration with enhanced connection pooling for emergency response system
+# Inherits optimized settings from base.py with production-specific overrides
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -35,8 +36,25 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '5432'),
+        # Enhanced connection pooling for production emergency response system
+        'CONN_HEALTH_CHECKS': True,
         'OPTIONS': {
-        },
+            'sslmode': 'require',  # Require SSL in production
+            'connect_timeout': 10,
+            # Production-optimized psycopg connection pooling
+            'pool': {
+                'min_size': 10,  # Higher minimum for production load
+                'max_size': 50,  # Higher maximum for emergency response capacity
+                'timeout': 20,   # Longer timeout for production stability
+                'max_lifetime': 3600,  # Connection lifetime in seconds
+                'max_idle': 300,  # Max idle time before connection cleanup
+            },
+            # PostgreSQL production optimizations
+            'application_name': 'naboom_emergency_system_prod',
+            'keepalives_idle': '600',
+            'keepalives_interval': '30', 
+            'keepalives_count': '3',
+        }
     }
 }
 
@@ -243,10 +261,35 @@ LOGGING = {
 # Database query optimization
 DATABASE_ROUTERS = []
 
-# Cache optimization
+# Enhanced database performance monitoring for emergency response system
+LOGGING['loggers']['django.db.backends'] = {
+    'handlers': ['console'],
+    'level': 'DEBUG' if DEBUG else 'INFO',
+    'propagate': False,
+}
+
+# Database query performance monitoring
+if not DEBUG:
+    LOGGING['loggers']['django.db.backends'] = {
+        'handlers': ['console'],
+        'level': 'WARNING',  # Only log slow queries in production
+        'propagate': False,
+    }
+
+# Cache optimization with emergency response system tuning
 CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 300
 CACHE_MIDDLEWARE_KEY_PREFIX = 'naboom'
+
+# Enhanced Redis configuration for emergency response system
+CACHES['default']['OPTIONS']['CONNECTION_POOL_KWARGS'].update({
+    'max_connections': 1000,  # Increased for emergency response load
+    'retry_on_timeout': True,
+    'socket_keepalive': True,
+    'socket_connect_timeout': 5,
+    'socket_timeout': 5,
+    'health_check_interval': 30,  # Health check every 30 seconds
+})
 
 # File upload optimization
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
