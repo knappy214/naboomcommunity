@@ -167,6 +167,10 @@ CHANNEL_LAYERS = {
                     int(os.getenv("REDIS_PORT", "6379")),
                 )
             ],
+            "capacity": 2000,  # Increased from default 1000 for better performance
+            "expiry": 60,      # Reduced expiry for better memory usage
+            "group_expiry": 86400,
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     }
 }
@@ -175,6 +179,38 @@ if not importlib.util.find_spec("channels_redis"):
     CHANNEL_LAYERS["default"] = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     }
+
+# Redis caching configuration for WebSocket performance
+# Use environment variables for Redis authentication if available
+redis_host = os.getenv('REDIS_HOST', '127.0.0.1')
+redis_port = os.getenv('REDIS_PORT', '6379')
+redis_password = os.getenv('REDIS_PASSWORD', '')
+redis_user = os.getenv('REDIS_USER', '')
+
+# Build Redis URL with authentication if credentials are provided
+if redis_user and redis_password:
+    redis_url = f"redis://{redis_user}:{redis_password}@{redis_host}:{redis_port}/0"
+elif redis_password:
+    redis_url = f"redis://:{redis_password}@{redis_host}:{redis_port}/0"
+else:
+    redis_url = f"redis://{redis_host}:{redis_port}/0"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": redis_url,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": 500,  # Increased for HTTP/3 multiplexing
+                "retry_on_timeout": True,
+                "socket_keepalive": True,
+                "socket_connect_timeout": 5,
+                "socket_timeout": 5,
+            },
+        },
+    }
+}
 
 
 # Database
@@ -502,12 +538,16 @@ COMMUNITY_ALERT_DUPLICATE_THRESHOLD = float(
     os.getenv("COMMUNITY_ALERT_DUPLICATE_THRESHOLD", "0.7")
 )
 
-# Django Channels configuration
+# Django Channels configuration (optimized for performance)
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")],
+            "capacity": 2000,  # Increased from default 1000 for better performance
+            "expiry": 60,      # Reduced expiry for better memory usage
+            "group_expiry": 86400,
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     },
 }
