@@ -224,6 +224,12 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "hpG8R0bIQpS@&5yO"),
         "HOST": os.getenv("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        "CONN_MAX_AGE": 300,  # Connection pooling - 5 minutes
+        "CONN_HEALTH_CHECKS": True,  # Health checks for connection pool
+        "OPTIONS": {
+            "sslmode": "prefer",  # SSL mode for security
+            "connect_timeout": 10,  # Connection timeout
+        }
     }
 }
 

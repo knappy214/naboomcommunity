@@ -56,14 +56,20 @@ class ChannelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedAndActive]
 
     def get_queryset(self):
-        qs = Channel.objects.filter(is_active=True)
         user = self.request.user
         if not user.is_authenticated:
-            return qs.filter(is_private=False)
-        member_channel_ids = ChannelMembership.objects.filter(
-            user=user, is_active=True
-        ).values_list("channel_id", flat=True)
-        return qs.filter(Q(is_private=False) | Q(id__in=member_channel_ids))
+            return Channel.objects.filter(is_active=True, is_private=False)
+        
+        # Optimized query with select_related and prefetch_related
+        return Channel.objects.select_related().prefetch_related(
+            "memberships",
+            "memberships__user",
+            "memberships__user__profile"
+        ).filter(
+            is_active=True
+        ).filter(
+            Q(is_private=False) | Q(memberships__user=user, memberships__is_active=True)
+        ).distinct()
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticatedAndActive])
     def join(self, request, pk=None):
@@ -162,14 +168,23 @@ class ThreadViewSet(viewsets.ModelViewSet):
     throttle_classes = [PostBurstRateThrottle]
 
     def get_queryset(self):
-        qs = Thread.objects.select_related("channel", "author").prefetch_related("posts").order_by("-created_at")
         user = self.request.user
         if not user.is_authenticated:
-            return qs.none()
-        channel_ids = ChannelMembership.objects.filter(user=user, is_active=True).values_list(
-            "channel_id", flat=True
-        )
-        return qs.filter(channel_id__in=channel_ids)
+            return Thread.objects.none()
+        
+        # Optimized query with select_related and prefetch_related to avoid N+1 queries
+        return Thread.objects.select_related(
+            "channel", 
+            "author",
+            "author__profile"  # Include user profile for author
+        ).prefetch_related(
+            "posts",
+            "posts__author",  # Prefetch post authors
+            "channel__memberships"  # Prefetch channel memberships
+        ).filter(
+            channel__memberships__user=user,
+            channel__memberships__is_active=True
+        ).distinct().order_by("-created_at")
 
     def perform_create(self, serializer):
         channel = serializer.validated_data["channel"]
@@ -205,10 +220,20 @@ class PostViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if not user.is_authenticated:
             return Post.objects.none()
-        channel_ids = ChannelMembership.objects.filter(user=user, is_active=True).values_list(
-            "channel_id", flat=True
-        )
-        return Post.objects.select_related("thread", "channel", "author").filter(channel_id__in=channel_ids)
+        
+        # Optimized query with select_related and prefetch_related to avoid N+1 queries
+        return Post.objects.select_related(
+            "thread", 
+            "channel", 
+            "author", 
+            "author__profile"  # Include user profile for author
+        ).prefetch_related(
+            "thread__posts",  # Prefetch related posts in thread
+            "channel__memberships"  # Prefetch channel memberships
+        ).filter(
+            channel__memberships__user=user,
+            channel__memberships__is_active=True
+        ).distinct()
 
     def perform_create(self, serializer):
         with transaction.atomic():
