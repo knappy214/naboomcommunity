@@ -511,6 +511,44 @@ CORS_EXPOSE_HEADERS = [
     'x-csrftoken',
 ]
 
+# DRF Spectacular Configuration for OpenAPI Schema Generation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Naboom Community Emergency Response API',
+    'DESCRIPTION': 'Emergency response and community management system API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'ENUM_NAME_OVERRIDES': {
+        'Kind93eEnum': 'KindEnum',  # Fix enum naming collision
+        'KindEnum': 'KindEnum',  # Ensure consistent naming
+    },
+    'OPERATION_ID_BASE': 'naboom_community',  # Custom operation ID prefix
+    'TAGS': [
+        {'name': 'Community Hub', 'description': 'Community management and communication'},
+        {'name': 'Emergency Response', 'description': 'Panic and emergency response system'},
+        {'name': 'User Management', 'description': 'User profiles and authentication'},
+        {'name': 'Content Management', 'description': 'Wagtail CMS content management'},
+    ],
+    'EXTENSIONS_INFO': {
+        'x-logo': {
+            'url': 'https://naboomneighbornet.net.za/static/images/logo.png',
+            'altText': 'Naboom Community Logo'
+        }
+    },
+    'SERVERS': [
+        {
+            'url': 'https://naboomneighbornet.net.za',
+            'description': 'Production server'
+        },
+        {
+            'url': 'http://localhost:8000',
+            'description': 'Development server'
+        }
+    ],
+}
+
 CLICKATELL_API_KEY = os.getenv("CLICKATELL_API_KEY", "")
 CLICKATELL_BASE = os.getenv("CLICKATELL_BASE", "https://platform.clickatell.com")
 PANIC_WEBHOOK_SECRET = os.getenv("PANIC_WEBHOOK_SECRET", "")

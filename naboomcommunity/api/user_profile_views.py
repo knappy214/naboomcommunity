@@ -4,6 +4,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
 from home.models import UserProfile, UserGroup, UserRole, UserGroupMembership
 from .user_profile_serializers import (
     UserProfileSerializer,
@@ -67,7 +69,13 @@ class UserPasswordChangeView(APIView):
     POST /api/user-profile/change-password/
     """
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserPasswordChangeSerializer
     
+    @extend_schema(
+        request=UserPasswordChangeSerializer,
+        responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+        description="Change user password"
+    )
     def post(self, request):
         """Change user password."""
         serializer = UserPasswordChangeSerializer(
@@ -143,6 +151,10 @@ class UserGroupMembershipDetailView(generics.RetrieveUpdateDestroyAPIView):
         )
 
 
+@extend_schema(
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+    description="Get user profile statistics"
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def user_profile_stats(request):
@@ -185,6 +197,11 @@ def user_profile_stats(request):
     return Response(stats)
 
 
+@extend_schema(
+    request={"type": "object", "properties": {"group_id": {"type": "integer"}}},
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+    description="Join a user group"
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def join_group(request):
@@ -245,6 +262,11 @@ def join_group(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    request={"type": "object", "properties": {"group_id": {"type": "integer"}}},
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+    description="Leave a user group"
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def leave_group(request):
@@ -284,7 +306,13 @@ class AvatarUploadView(APIView):
     POST /api/user-profile/avatar/upload/
     """
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AvatarUploadSerializer
     
+    @extend_schema(
+        request=AvatarUploadSerializer,
+        responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+        description="Upload user avatar"
+    )
     def post(self, request):
         """Upload a new avatar."""
         serializer = AvatarUploadSerializer(
@@ -319,6 +347,10 @@ class AvatarDeleteView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     
+    @extend_schema(
+        responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+        description="Delete user avatar"
+    )
     def delete(self, request):
         """Delete the current user's avatar."""
         profile = request.user.profile
@@ -345,6 +377,10 @@ class AvatarDeleteView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+    description="Get user avatar information"
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def avatar_info(request):
@@ -381,6 +417,11 @@ def avatar_info(request):
     })
 
 
+@extend_schema(
+    request={"type": "object", "properties": {"image_id": {"type": "integer"}}},
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}},
+    description="Set avatar from existing image"
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def set_avatar_from_existing(request):

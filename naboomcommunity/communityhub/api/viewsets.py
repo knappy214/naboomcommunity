@@ -16,6 +16,8 @@ from rest_framework.permissions import SAFE_METHODS
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 from ..consumers import broadcast_new_post, broadcast_new_thread
 from ..models import (
@@ -120,6 +122,38 @@ class ChannelInviteViewSet(viewsets.ModelViewSet):
 class ChannelJoinRequestViewSet(viewsets.ModelViewSet):
     serializer_class = ChannelJoinRequestSerializer
     permission_classes = [IsAuthenticatedAndActive]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Join request ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Join request ID"),
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Join request ID"),
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Join request ID"),
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
@@ -319,6 +353,38 @@ class EventMetaViewSet(viewsets.ModelViewSet):
     serializer_class = EventMetaSerializer
     permission_classes = [IsAuthenticatedAndActive, IsChannelModeratorOrReadOnly]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event meta ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event meta ID"),
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event meta ID"),
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event meta ID"),
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         channel_ids = ChannelMembership.objects.filter(user=user, is_active=True).values_list(
@@ -344,6 +410,38 @@ class EventRSVPViewSet(viewsets.ModelViewSet):
     serializer_class = EventRSVPSerializer
     permission_classes = [IsAuthenticatedAndActive]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event RSVP ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event RSVP ID"),
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event RSVP ID"),
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Event RSVP ID"),
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         channel_ids = ChannelMembership.objects.filter(user=user, is_active=True).values_list(
@@ -368,6 +466,38 @@ class DeviceViewSet(viewsets.ModelViewSet):
     serializer_class = DeviceSerializer
     permission_classes = [IsAuthenticatedAndActive]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Device ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Device ID"),
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Device ID"),
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Device ID"),
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
     def get_queryset(self):
         return Device.objects.filter(user=self.request.user)
 
@@ -375,6 +505,38 @@ class DeviceViewSet(viewsets.ModelViewSet):
 class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
     permission_classes = [IsAuthenticatedAndActive, IsChannelMember]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Report ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Report ID"),
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Report ID"),
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Report ID"),
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
@@ -390,6 +552,14 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AuditLogSerializer
     permission_classes = [IsAuthenticatedAndActive]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("id", OpenApiTypes.INT, OpenApiParameter.PATH, description="Audit log ID"),
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         channels = ChannelMembership.objects.filter(user=user, is_active=True).values_list(
@@ -402,7 +572,15 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ThreadSearchView(APIView):
     permission_classes = [IsAuthenticatedAndActive]
+    serializer_class = ThreadSerializer
 
+    @extend_schema(
+        responses={200: ThreadSerializer(many=True)},
+        parameters=[
+            OpenApiParameter("q", OpenApiTypes.STR, OpenApiParameter.QUERY, description="Search query"),
+            OpenApiParameter("channel", OpenApiTypes.INT, OpenApiParameter.QUERY, description="Channel ID filter"),
+        ]
+    )
     def get(self, request, *args, **kwargs):
         query = request.query_params.get("q", "").strip()
         channel_id = request.query_params.get("channel")
@@ -431,5 +609,9 @@ class ThreadSearchView(APIView):
 class VapidPublicKeyView(APIView):
     permission_classes = [IsAuthenticatedAndActive]
 
+    @extend_schema(
+        responses={200: {"type": "object", "properties": {"publicKey": {"type": "string"}}}},
+        description="Get VAPID public key for web push notifications"
+    )
     def get(self, request, *args, **kwargs):
         return Response({"publicKey": settings.WEBPUSH_VAPID_PUBLIC_KEY})
