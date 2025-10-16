@@ -41,6 +41,9 @@ except ImportError:
     MODELS_AVAILABLE = False
 
 
+# Ensure custom submenu registration is imported (mirrors Community Hub pattern)
+from . import admin_menu  # noqa: F401
+
 # PanicDashboardView removed - now using ViewSetGroup with sub-items
 
 if MODELS_AVAILABLE:

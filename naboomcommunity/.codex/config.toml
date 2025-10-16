@@ -1,0 +1,11 @@
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+env = { "API_KEY" = "ctx7sk-29e1b3ff-3ac3-405c-b6d3-213882cd4294" }
+[mcp_servers.snyk-security]
+command = "npx"
+args = ["-y", "snyk@latest", "mcp", "-t", "stdio"]
+[mcp_servers.brightData]
+command = "npx"
+args = ["-y", "@brightdata/mcp"]
+env = { "API_TOKEN" = "bd2894499a5f297600a5d0f5bf13534dbf1dc1a36c2bbb6fefe80ebb32e3eb01"}
